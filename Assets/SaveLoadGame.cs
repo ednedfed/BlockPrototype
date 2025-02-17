@@ -30,16 +30,19 @@ public class SaveLoadGame : MonoBehaviour
 
                     foreach (var cube in saveData.placedCubes)
                     {
-                        sw.Write(0);//cube type
+                        var placedBlock = cube.Value;
+                        var blockTransform = placedBlock.gameObject.transform;
 
-                        sw.Write(cube.Value.transform.position.x);
-                        sw.Write(cube.Value.transform.position.y);
-                        sw.Write(cube.Value.transform.position.z);
+                        sw.Write(placedBlock.blockType);
+                                 
+                        sw.Write(blockTransform.position.x);
+                        sw.Write(blockTransform.position.y);
+                        sw.Write(blockTransform.position.z);
 
-                        sw.Write(cube.Value.transform.rotation.x);
-                        sw.Write(cube.Value.transform.rotation.y);
-                        sw.Write(cube.Value.transform.rotation.z);
-                        sw.Write(cube.Value.transform.rotation.w);
+                        sw.Write(blockTransform.rotation.x);
+                        sw.Write(blockTransform.rotation.y);
+                        sw.Write(blockTransform.rotation.z);
+                        sw.Write(blockTransform.rotation.w);
                     }
                 }
             }

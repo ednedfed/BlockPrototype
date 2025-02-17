@@ -43,6 +43,11 @@ public class GhostPosition : MonoBehaviour
 
         //todo: extract this functionality
         var ghostcollider = ghost.GetComponentInChildren<Collider>();
+        if (ghostcollider == null)
+        {
+            return;
+        }
+
         var overlapCount = Physics.OverlapBoxNonAlloc(ghostcollider.transform.position, new float3(0.49f), resultsNoAlloc, ghostcollider.transform.rotation, layerMask);
 
         hitObject.isOverlapping = overlapCount > 0;

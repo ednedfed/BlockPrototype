@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 
-public partial class PlaceBlock : MonoBehaviour
+public class PlaceBlock : MonoBehaviour
 {
     public GameObject ghost;
-    public uint blockType;
     public HitObject hitObject;
+    public GhostBlockData ghostBlockData;
     public BlockFactory blockFactory;
 
     // Update is called once per frame
@@ -12,7 +13,7 @@ public partial class PlaceBlock : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Mouse0) && hitObject.isOverlapping == false)
         {
-            blockFactory.InstantiateBlock(blockType, ghost.transform.position, ghost.transform.rotation);
+            blockFactory.InstantiateBlock(ghostBlockData.blockType, ghost.transform.position, ghost.transform.rotation);
         }
     }
 }
