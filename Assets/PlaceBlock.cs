@@ -1,19 +1,18 @@
 using UnityEngine;
 
-public class PlaceBlock : MonoBehaviour
+public partial class PlaceBlock : MonoBehaviour
 {
     public GameObject ghost;
-    public GameObject block;
-
+    public uint blockType;
     public HitObject hitObject;
+    public BlockFactory blockFactory;
 
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0) && hitObject.isOverlapping == false)
         {
-            //for now use all one material
-            GameObject placedBlock = GameObject.Instantiate(block, ghost.transform.position, ghost.transform.rotation);
+            blockFactory.InstantiateBlock(blockType, ghost.transform.position, ghost.transform.rotation);
         }
     }
 }

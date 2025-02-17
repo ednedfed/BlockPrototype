@@ -8,6 +8,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Mothership.unity
+    guid: bf97d13683347644a8934670494269a0
+  - enabled: 1
+    path: Assets/Scenes/Titlescreen.unity
+    guid: 9e0a42a28a6380c479f51dfc51edbf70
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
