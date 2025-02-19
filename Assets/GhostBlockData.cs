@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class GhostBlockData : MonoBehaviour
+public class GhostBlockData
 {
     public uint blockType;
 }

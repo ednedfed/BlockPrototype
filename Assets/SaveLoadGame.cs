@@ -1,12 +1,12 @@
 using System.IO;
 using UnityEngine;
 
-public class SaveLoadGame : MonoBehaviour
+public class SaveLoadGame : InjectableBehaviour
 {
     uint saveVersion = 0;
 
-    public SaveData saveData;
-    public BlockFactory blockFactory;
+    SaveData _saveData;
+    BlockFactory _blockFactory;
 
     // Update is called once per frame
     void Update()
@@ -19,7 +19,7 @@ public class SaveLoadGame : MonoBehaviour
                 {
                     sw.Write(saveVersion);//version
 
-                    foreach (var cube in saveData.placedCubes)
+                    foreach (var cube in _saveData.placedCubes)
                     {
                         var placedBlock = cube.Value;
                         var blockTransform = placedBlock.gameObject.transform;
@@ -41,7 +41,8 @@ public class SaveLoadGame : MonoBehaviour
 
         if (UnityEngine.Input.GetKeyDown(KeyCode.F6))
         {
-            saveData.Clear();
+            _blockFactory.ResetIdGen();
+            _saveData.Clear();
 
             if (File.Exists(BlockGameConstants.SaveGame.SaveLocation) == false)
             {
@@ -73,7 +74,7 @@ public class SaveLoadGame : MonoBehaviour
                         rot.z = sr.ReadSingle();
                         rot.w = sr.ReadSingle();
 
-                        blockFactory.InstantiateBlock(blockType, pos, rot);
+                        _blockFactory.InstantiateBlock(blockType, pos, rot);
                     }
                 }
             }

@@ -1,13 +1,13 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-public class GhostPosition : MonoBehaviour
+public class GhostPosition : InjectableBehaviour
 {
     public GameObject cursor;
     public GameObject ghost;
     public GhostRotation ghostRotation;
 
-    public HitObject hitObject;
+    HitObject _hitObject;
 
     void FixedUpdate()
     {
@@ -15,22 +15,22 @@ public class GhostPosition : MonoBehaviour
             transform.forward, out var hitInfo,
             BlockGameConstants.GhostBlock.RaycastDistance, BlockGameConstants.GameLayers.InverseGhostLayerMask);
 
-        hitObject.raycastHit = hitInfo;
-        hitObject.isCube = hitInfo.collider != null
+        _hitObject.raycastHit = hitInfo;
+        _hitObject.isCube = hitInfo.collider != null
             && hitInfo.collider.gameObject.layer == BlockGameConstants.GameLayers.BlockLayer;
 
-        if (hitObject.raycastHit.collider != null)
+        if (_hitObject.raycastHit.collider != null)
         {
             //todo: determine why these are the offsets required
-            var targetGhostPosition = (float3)hitObject.raycastHit.point +
+            var targetGhostPosition = (float3)_hitObject.raycastHit.point +
                 BlockGameConstants.BlockProperties.CubeCentre +
-                (float3)hitObject.raycastHit.normal * BlockGameConstants.BlockProperties.HalfCubeSize;
+                (float3)_hitObject.raycastHit.normal * BlockGameConstants.BlockProperties.HalfCubeSize;
 
             //snap on surface, don't snap y
             ghost.transform.position = math.floor(targetGhostPosition) +
                 new float3(BlockGameConstants.BlockProperties.HalfCubeSize, 0f, BlockGameConstants.BlockProperties.HalfCubeSize);
 
-            ghost.transform.up = hitObject.raycastHit.normal;
+            ghost.transform.up = _hitObject.raycastHit.normal;
 
             ghost.transform.rotation *= Quaternion.AngleAxis(
                 ghostRotation.direction * BlockGameConstants.GhostBlock.DegreesPerTurn,
@@ -54,10 +54,10 @@ public class GhostPosition : MonoBehaviour
             ghostcollider.transform.rotation,
             BlockGameConstants.GameLayers.InverseGhostLayerMask);
 
-        hitObject.isOverlapping = overlapCount > 0;
+        _hitObject.isOverlapping = overlapCount > 0;
 
         //todo: extract this functionality
-        if (hitObject.isOverlapping)
+        if (_hitObject.isOverlapping)
         {
             ghost.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.InvalidGhostColor;
             cursor.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.InvalidCursorColor;

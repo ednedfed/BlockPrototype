@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SaveData : MonoBehaviour
+public class SaveData
 {
     public class PlacedBlockData
     {
@@ -10,11 +10,9 @@ public class SaveData : MonoBehaviour
         public GameObject gameObject;
     }
 
-    //todo: make a factory
-    public int idGen;
     public Dictionary<int, PlacedBlockData> placedCubes = new Dictionary<int, PlacedBlockData>();
 
-    internal void Clear()
+    public void Clear()
     {
         foreach (var cube in placedCubes)
         {
@@ -22,7 +20,5 @@ public class SaveData : MonoBehaviour
         }
 
         placedCubes.Clear();
-
-        idGen = 0;
     }
 }

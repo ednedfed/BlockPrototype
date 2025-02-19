@@ -1,20 +1,20 @@
 using UnityEngine;
 
-public class DeleteBlock : MonoBehaviour
+public class DeleteBlock : InjectableBehaviour
 {
-    public HitObject hitObject;
-    public BlockFactory blockFactory;
+    HitObject _hitObject;
+    BlockFactory _blockFactory;
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse1) && hitObject.isCube)
+        if (Input.GetKeyDown(KeyCode.Mouse1) && _hitObject.isCube)
         {
-            var block = hitObject.raycastHit.collider.transform.root.gameObject;
+            var block = _hitObject.raycastHit.collider.transform.root.gameObject;
 
             var blockId = block.GetComponent<BlockIdComponent>();
 
-            blockFactory.RemoveBlock(blockId);
+            _blockFactory.RemoveBlock(blockId);
         }
     }
 }

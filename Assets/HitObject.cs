@@ -1,7 +1,7 @@
 using UnityEngine;
 
 //actually data
-public class HitObject : MonoBehaviour
+public class HitObject
 {
     public RaycastHit raycastHit;
     public bool isCube;

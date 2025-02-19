@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 
-public class GhostBlockType : MonoBehaviour
+public class GhostBlockType : InjectableBehaviour
 {
     public GameObject ghost;
-    public GhostBlockData ghostBlockData;
-    public BlockTypes blockTypes;
+    
+    GhostBlockData ghostBlockData;
+    BlockTypes blockTypes;
 
     void Update()
     {
