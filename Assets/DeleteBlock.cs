@@ -12,7 +12,7 @@ public class DeleteBlock : MonoBehaviour
         {
             var block = hitObject.raycastHit.collider.transform.root.gameObject;
 
-            var blockId = block.GetComponent<BlockId>();
+            var blockId = block.GetComponent<BlockIdComponent>();
 
             blockFactory.RemoveBlock(blockId);
         }

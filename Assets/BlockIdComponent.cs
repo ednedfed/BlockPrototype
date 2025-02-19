@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class BlockId : MonoBehaviour
+public class BlockIdComponent : MonoBehaviour
 {
     public int blockId;
 }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using static SaveData;
 
 public class BlockFactory : MonoBehaviour
 {
@@ -14,7 +13,7 @@ public class BlockFactory : MonoBehaviour
 
         //for now use all one material
         GameObject placedBlock = GameObject.Instantiate(blockTypes.blockPrefabs[blockType], position, rotation);
-        var blockId = placedBlock.AddComponent<BlockId>();
+        var blockId = placedBlock.AddComponent<BlockIdComponent>();
         blockId.blockId = saveData.idGen++;
 
         //todo: this will become entity collection?
@@ -28,7 +27,7 @@ public class BlockFactory : MonoBehaviour
         );
     }
 
-    public void RemoveBlock(BlockId blockId)
+    public void RemoveBlock(BlockIdComponent blockId)
     {
         var placedBlock = saveData.placedCubes[blockId.blockId];
         saveData.placedCubes.Remove(blockId.blockId);

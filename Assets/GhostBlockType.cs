@@ -9,7 +9,7 @@ public class GhostBlockType : MonoBehaviour
     void Update()
     {
         uint desiredBlockType = ghostBlockData.blockType;
-        for (int i = 0; i <= 10; ++i)
+        for (int i = 0; i <= BlockGameConstants.GhostBlock.BlockTypeCount; ++i)
         {
             if (Input.GetKeyDown((KeyCode)(i + KeyCode.Alpha0)))
             {

@@ -3,26 +3,17 @@ using UnityEngine;
 
 public class SaveLoadGame : MonoBehaviour
 {
-    private const string FILENAME = "/save.bin";
-
-    static string location;
-
     uint saveVersion = 0;
 
     public SaveData saveData;
     public BlockFactory blockFactory;
-
-    private void Awake()
-    {
-        location = Application.persistentDataPath + FILENAME;
-    }
 
     // Update is called once per frame
     void Update()
     {
         if (UnityEngine.Input.GetKeyDown(KeyCode.F5))
         {
-            using (var file = new FileStream(location, FileMode.Create))
+            using (var file = new FileStream(BlockGameConstants.SaveGame.SaveLocation, FileMode.Create))
             {
                 using (BinaryWriter sw = new BinaryWriter(file))
                 {
@@ -52,14 +43,14 @@ public class SaveLoadGame : MonoBehaviour
         {
             saveData.Clear();
 
-            if (File.Exists(location) == false)
+            if (File.Exists(BlockGameConstants.SaveGame.SaveLocation) == false)
             {
-                UnityEngine.Debug.Log($"{location} doesn't exist");
+                UnityEngine.Debug.Log($"{BlockGameConstants.SaveGame.SaveLocation} doesn't exist");
 
                 return;
             }
 
-            using (var file = File.OpenRead(location))
+            using (var file = File.OpenRead(BlockGameConstants.SaveGame.SaveLocation))
             {
                 using (BinaryReader sr = new BinaryReader(file))
                 {

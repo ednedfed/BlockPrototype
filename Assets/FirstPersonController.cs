@@ -5,9 +5,6 @@ public class FirstPersonController : MonoBehaviour
 {
     public Rigidbody rb;
 
-    float moveSpeed = 500f;
-    float rotateSpeed = 0.3f;
-
     private void Start()
     {
         //don't have pointer waving around
@@ -53,12 +50,12 @@ public class FirstPersonController : MonoBehaviour
             velocity.y -= 1;
         }
 
-        rb.linearVelocity = transform.rotation * velocity * moveSpeed * Time.deltaTime;
+        rb.linearVelocity = transform.rotation * velocity * BlockGameConstants.Drone.MoveSpeed * Time.deltaTime;
     }
 
     void UpdateRotation()
     {
-        var mouseDelta = Input.mousePositionDelta * rotateSpeed;
+        var mouseDelta = Input.mousePositionDelta * BlockGameConstants.Drone.RotateSpeed;
 
         var delta3dx = new float3(0f, mouseDelta.x, 0f);
 

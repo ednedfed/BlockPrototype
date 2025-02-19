@@ -1,4 +1,3 @@
-using Unity.Mathematics;
 using UnityEngine;
 
 public class GhostRotation : MonoBehaviour
@@ -16,7 +15,7 @@ public class GhostRotation : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.E))
             direction--;
 
-        direction += 4;
-        direction %= 4;
+        direction += BlockGameConstants.GhostBlock.NumDirections;
+        direction %= BlockGameConstants.GhostBlock.NumDirections;
     }
 }
