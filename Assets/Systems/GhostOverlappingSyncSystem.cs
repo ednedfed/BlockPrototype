@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Rendering;
 using UnityEngine;
 
 [DisableAutoCreation]
@@ -25,19 +26,20 @@ partial class GhostOverlappingSyncSystem : SystemBase
                 }
             }
         }
-        /*
-        var cursorRenderer = _cursor.GetComponentInChildren<Renderer>();
-        if (cursorRenderer != null)
+
+        foreach (var hitObject in SystemAPI.Query<HitObjectComponent>())
         {
-            if (_hitObject.isOverlapping)
+            foreach (var (_, baseColor) in SystemAPI.Query<CursorMeshTagComponent, RefRW<URPMaterialPropertyBaseColor>>())
             {
-                cursorRenderer.material.color = BlockGameConstants.GhostBlock.InvalidCursorColor;
-            }
-            else
-            {
-                cursorRenderer.material.color = BlockGameConstants.GhostBlock.ValidCursorColor;
+                if (hitObject.isOverlapping)
+                {
+                    baseColor.ValueRW.Value = (Vector4)BlockGameConstants.GhostBlock.InvalidCursorColor;
+                }
+                else
+                {
+                    baseColor.ValueRW.Value = (Vector4)BlockGameConstants.GhostBlock.ValidCursorColor;
+                }
             }
         }
-        */
     }
 }

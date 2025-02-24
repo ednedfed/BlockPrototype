@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 437580319}
   - component: {fileID: 437580320}
   - component: {fileID: 437580321}
+  - component: {fileID: 437580322}
   m_Layer: 6
   m_Name: GhostCube
   m_TagString: Untagged
@@ -187,6 +188,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6a35a2aa72092cd49b868f0d22e76102, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &437580322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437580317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7135cccf94b66e14e828bc0b6e774bc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1471560309
