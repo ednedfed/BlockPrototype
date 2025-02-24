@@ -6,16 +6,14 @@ using UnityEngine;
 partial class GhostPositionUpdateSystem : SystemBase
 {
     GameObject _character;
-    GameObject _cursor;
     GameObject _ghost;
     GhostBlockData _ghostBlockData;
 
     HitObject _hitObject;
 
-    public GhostPositionUpdateSystem(GameObject character, GameObject cursor, GameObject ghost, GhostBlockData ghostBlockData, HitObject hitObject)
+    public GhostPositionUpdateSystem(GameObject character, GameObject ghost, GhostBlockData ghostBlockData, HitObject hitObject)
     {
         _character = character;
-        _cursor = cursor;
         _ghost = ghost;
         _ghostBlockData = ghostBlockData;
         _hitObject = hitObject;
@@ -47,10 +45,6 @@ partial class GhostPositionUpdateSystem : SystemBase
             _ghost.transform.rotation *= Quaternion.AngleAxis(
                 _ghostBlockData.direction * BlockGameConstants.GhostBlock.DegreesPerTurn,
                 Vector3.up);
-
-            //cursor is parented to ghost
-            _cursor.transform.position = _ghost.transform.position;
-            _cursor.transform.rotation = _ghost.transform.rotation;
         }
 
         var ghostcollider = _ghost.GetComponentInChildren<Collider>();

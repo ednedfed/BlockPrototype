@@ -4,13 +4,11 @@ using UnityEngine;
 [DisableAutoCreation]
 partial class GhostOverlappingSyncSystem : SystemBase
 {
-    GameObject _cursor;
     GameObject _ghost;
     HitObject _hitObject;
 
-    public GhostOverlappingSyncSystem(GameObject cursor, GameObject ghost, HitObject hitObject)
+    public GhostOverlappingSyncSystem(GameObject ghost, HitObject hitObject)
     {
-        _cursor = cursor;
         _ghost = ghost;
         _hitObject = hitObject;
     }
@@ -29,7 +27,7 @@ partial class GhostOverlappingSyncSystem : SystemBase
                 ghostRenderer.material.color = BlockGameConstants.GhostBlock.ValidGhostColor;
             }
         }
-
+        /*
         var cursorRenderer = _cursor.GetComponentInChildren<Renderer>();
         if (cursorRenderer != null)
         {
@@ -42,5 +40,6 @@ partial class GhostOverlappingSyncSystem : SystemBase
                 cursorRenderer.material.color = BlockGameConstants.GhostBlock.ValidCursorColor;
             }
         }
+        */
     }
 }

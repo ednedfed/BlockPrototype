@@ -6,7 +6,6 @@ public partial class MainGameContext : MonoBehaviour
     //scene objects, make spawn later
     public GameObject character;
     public GameObject ghost;
-    public GameObject cursor;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -32,8 +31,9 @@ public partial class MainGameContext : MonoBehaviour
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
         AddToWorldAndGroupSystemManaged(new FirstPersonControllerSystem(character.GetComponent<Rigidbody>(), character.transform), world, fixedStepSimulationGroup);
-        AddToWorldAndGroupSystemManaged(new GhostPositionUpdateSystem(character, cursor, ghost, ghostBlockData, hitObject), world, fixedStepSimulationGroup);
-        AddToWorldAndGroupSystemManaged(new GhostOverlappingSyncSystem(cursor, ghost, hitObject), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostPositionUpdateSystem(character, ghost, ghostBlockData, hitObject), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostOverlappingSyncSystem(ghost, hitObject), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new ParentCursorToGhostSystem(ghost), world, fixedStepSimulationGroup);
 
         simulationGroup.SortSystems();
         fixedStepSimulationGroup.SortSystems();
