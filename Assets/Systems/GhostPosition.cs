@@ -1,7 +1,9 @@
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-class GhostPosition
+[DisableAutoCreation]
+partial class GhostPosition : SystemBase
 {
     GameObject _character;
     GameObject _cursor;
@@ -19,7 +21,7 @@ class GhostPosition
         _hitObject = hitObject;
     }
 
-    public void FixedUpdate()
+    protected override void OnUpdate()
     {
         Physics.Raycast(_character.transform.position + _character.transform.forward * BlockGameConstants.GhostBlock.StartRaycastDistance,
             _character.transform.forward, out var hitInfo,

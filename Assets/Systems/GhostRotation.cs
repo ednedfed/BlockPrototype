@@ -1,6 +1,8 @@
+using Unity.Entities;
 using UnityEngine;
 
-class GhostRotation
+[DisableAutoCreation]
+partial class GhostRotation : SystemBase
 {
     GhostBlockData _ghostBlockData;
 
@@ -9,7 +11,7 @@ class GhostRotation
         _ghostBlockData = ghostBlockData;
     }
 
-    public void Update()
+    protected override void OnUpdate()
     {
         if (Input.GetKeyDown(KeyCode.Q))
             _ghostBlockData.direction++;

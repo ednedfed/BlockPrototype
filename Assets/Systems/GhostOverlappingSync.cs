@@ -1,10 +1,11 @@
+using Unity.Entities;
 using UnityEngine;
 
-class GhostOverlappingSync
+[DisableAutoCreation]
+partial class GhostOverlappingSync : SystemBase
 {
     GameObject _cursor;
     GameObject _ghost;
-
     HitObject _hitObject;
 
     public GhostOverlappingSync(GameObject cursor, GameObject ghost, HitObject hitObject)
@@ -14,18 +15,32 @@ class GhostOverlappingSync
         _hitObject = hitObject;
     }
 
-    public void FixedUpdate()
+    protected override void OnUpdate()
     {
-        //todo: extract this functionality
-        if (_hitObject.isOverlapping)
+        var ghostRenderer = _ghost.GetComponentInChildren<Renderer>();
+        if (ghostRenderer != null)
         {
-            _ghost.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.InvalidGhostColor;
-            _cursor.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.InvalidCursorColor;
+            if (_hitObject.isOverlapping)
+            {
+                ghostRenderer.material.color = BlockGameConstants.GhostBlock.InvalidGhostColor;
+            }
+            else
+            {
+                ghostRenderer.material.color = BlockGameConstants.GhostBlock.ValidGhostColor;
+            }
         }
-        else
+
+        var cursorRenderer = _cursor.GetComponentInChildren<Renderer>();
+        if (cursorRenderer != null)
         {
-            _ghost.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.ValidGhostColor;
-            _cursor.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.ValidCursorColor;
+            if (_hitObject.isOverlapping)
+            {
+                cursorRenderer.material.color = BlockGameConstants.GhostBlock.InvalidCursorColor;
+            }
+            else
+            {
+                cursorRenderer.material.color = BlockGameConstants.GhostBlock.ValidCursorColor;
+            }
         }
     }
 }

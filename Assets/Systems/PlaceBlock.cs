@@ -1,6 +1,8 @@
+using Unity.Entities;
 using UnityEngine;
 
-class PlaceBlock
+[DisableAutoCreation]
+partial class PlaceBlock : SystemBase
 {
     GameObject _ghost;
 
@@ -16,8 +18,7 @@ class PlaceBlock
         _blockFactory = blockFactory;
     }
 
-    // Update is called once per frame
-    public void Update()
+    protected override void OnUpdate()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0) && _hitObject.isOverlapping == false)
         {

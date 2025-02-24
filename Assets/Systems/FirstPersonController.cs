@@ -1,26 +1,35 @@
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-class FirstPersonController
+[DisableAutoCreation]
+partial class FirstPersonController : SystemBase
 {
-    public Rigidbody rb;
-    public Transform charTransform;
+    Rigidbody _rb;
+    Transform _charTransform;
 
-    public void Start()
+    public FirstPersonController(Rigidbody rb, Transform charTransform)
+    {
+        _rb = rb;
+        _charTransform = charTransform;
+    }
+
+    protected override void OnCreate()
     {
         //don't have pointer waving around
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    // Update is called once per frame
-    public void FixedUpdate()
+    protected override void OnUpdate()
     {
-        UpdateTranslation();
+        float deltaTime = SystemAPI.Time.DeltaTime;
+
+        UpdateTranslation(deltaTime);
 
         UpdateRotation();
     }
 
-    private void UpdateTranslation()
+    private void UpdateTranslation(float deltaTime)
     {
         var velocity = float3.zero;
 
@@ -51,7 +60,7 @@ class FirstPersonController
             velocity.y -= 1;
         }
 
-        rb.linearVelocity = charTransform.rotation * velocity * BlockGameConstants.Drone.MoveSpeed * Time.deltaTime;
+        _rb.linearVelocity = _charTransform.rotation * velocity * BlockGameConstants.Drone.MoveSpeed * deltaTime;
     }
 
     void UpdateRotation()
@@ -60,10 +69,10 @@ class FirstPersonController
 
         var delta3dx = new float3(0f, mouseDelta.x, 0f);
 
-        charTransform.Rotate(delta3dx, Space.World);
+        _charTransform.Rotate(delta3dx, Space.World);
 
         var delta3dy = new float3(-mouseDelta.y, 0f, 0f);
 
-        charTransform.Rotate(delta3dy, Space.Self);
+        _charTransform.Rotate(delta3dy, Space.Self);
     }
 }

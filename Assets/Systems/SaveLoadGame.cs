@@ -1,7 +1,9 @@
 using System.IO;
+using Unity.Entities;
 using UnityEngine;
 
-class SaveLoadGame
+[DisableAutoCreation]
+partial class SaveLoadGame : SystemBase
 {
     uint _saveVersion = 0;
 
@@ -15,8 +17,7 @@ class SaveLoadGame
         _blockFactory = blockFactory;
     }
 
-    // Update is called once per frame
-    public void Update()
+    protected override void OnUpdate()
     {
         if (UnityEngine.Input.GetKeyDown(KeyCode.F5))
         {
@@ -32,7 +33,7 @@ class SaveLoadGame
                         var blockTransform = placedBlock.gameObject.transform;
 
                         sw.Write(placedBlock.blockType);
-                                 
+
                         sw.Write(blockTransform.position.x);
                         sw.Write(blockTransform.position.y);
                         sw.Write(blockTransform.position.z);

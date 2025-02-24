@@ -1,20 +1,22 @@
-﻿using UnityEngine;
+﻿using Unity.Entities;
+using UnityEngine;
 
-class GhostBlockType
+[DisableAutoCreation]
+partial class GhostBlockTypeSyncSystem : SystemBase
 {
     GameObject _ghost;
     
     GhostBlockData ghostBlockData;
     BlockTypes blockTypes;
 
-    public GhostBlockType(GameObject ghost, GhostBlockData ghostBlockData, BlockTypes blockTypes)
+    public GhostBlockTypeSyncSystem(GameObject ghost, GhostBlockData ghostBlockData, BlockTypes blockTypes)
     {
         _ghost = ghost;
         this.ghostBlockData = ghostBlockData;
         this.blockTypes = blockTypes;
     }
 
-    public void Update()
+    protected override void OnUpdate()
     {
         uint desiredBlockType = ghostBlockData.blockType;
         for (int i = 0; i <= BlockGameConstants.GhostBlock.BlockTypeCount; ++i)

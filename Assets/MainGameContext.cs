@@ -1,3 +1,4 @@
+using Unity.Entities;
 using UnityEngine;
 
 public partial class MainGameContext : MonoBehaviour
@@ -6,16 +7,6 @@ public partial class MainGameContext : MonoBehaviour
     public GameObject character;
     public GameObject ghost;
     public GameObject cursor;
-
-    //will become systems after we move everything off game object and it still works
-    FirstPersonController _firstPersonController;
-    DeleteBlock _deleteBlockSystem;
-    PlaceBlock _placeBlockSystem;
-    GhostBlockType _ghostBlockType;
-    GhostPosition _ghostPosition;
-    GhostOverlappingSync _ghostOverlappingSync;
-    GhostRotation _ghostRotation;
-    SaveLoadGame _saveLoadGame;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -28,42 +19,29 @@ public partial class MainGameContext : MonoBehaviour
         SaveData saveData = new SaveData();
         BlockFactory blockFactory = new BlockFactory(blockTypes, saveData);
 
-        //separate what will become systems here, once data is split we can work on making real systems
-        _firstPersonController = new FirstPersonController();
-        _firstPersonController.charTransform = character.transform;
-        _firstPersonController.rb = character.GetComponent<Rigidbody>();
-        _firstPersonController.Start();
+        //todo: totally custom world to exclude unnecessary sytems
+        var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
+        var simulationGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
 
-        _deleteBlockSystem = new DeleteBlock(hitObject, blockFactory);
-        _placeBlockSystem = new PlaceBlock(ghost, hitObject, ghostBlockData, blockFactory);
-        _ghostBlockType = new GhostBlockType(ghost, ghostBlockData, blockTypes);
-        _ghostRotation = new GhostRotation(ghostBlockData);
-        _ghostPosition = new GhostPosition(character, cursor, ghost, ghostBlockData, hitObject);
-        _ghostOverlappingSync = new GhostOverlappingSync(cursor, ghost, hitObject);
-        _saveLoadGame = new SaveLoadGame(0, saveData, blockFactory);
+        AddToWorldAndGroupSystemManaged(new DeleteBlockSystem(hitObject, blockFactory), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostBlockTypeSyncSystem(ghost, ghostBlockData, blockTypes), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostRotation(ghostBlockData), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new PlaceBlock(ghost, hitObject, ghostBlockData, blockFactory), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new SaveLoadGame(0, saveData, blockFactory), world, simulationGroup);
 
-        //inject, but later use ECS world so don't write an entire DI system yet
-        DependencyInjection.InjectIntoMonobehaviours(blockTypes);
-        DependencyInjection.InjectIntoMonobehaviours(hitObject);
-        DependencyInjection.InjectIntoMonobehaviours(ghostBlockData);
-        DependencyInjection.InjectIntoMonobehaviours(saveData);
-        DependencyInjection.InjectIntoMonobehaviours(blockFactory);
+        var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
+
+        AddToWorldAndGroupSystemManaged(new FirstPersonController(character.GetComponent<Rigidbody>(), character.transform), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostPosition(character, cursor, ghost, ghostBlockData, hitObject), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostOverlappingSync(cursor, ghost, hitObject), world, fixedStepSimulationGroup);
+
+        simulationGroup.SortSystems();
+        fixedStepSimulationGroup.SortSystems();
     }
 
-    // Update is called once per frame
-    void Update()
+    static void AddToWorldAndGroupSystemManaged<T>(T system, World w, ComponentSystemGroup simulationGroup) where T : ComponentSystemBase
     {
-        _deleteBlockSystem.Update();
-        _placeBlockSystem.Update();
-        _ghostBlockType.Update();
-        _ghostRotation.Update();
-        _saveLoadGame.Update();
-    }
-
-    void FixedUpdate()
-    {
-        _firstPersonController.FixedUpdate();
-        _ghostPosition.FixedUpdate();
-        _ghostOverlappingSync.FixedUpdate();
+        var addedSystem = w.AddSystemManaged(system);
+        simulationGroup.AddSystemToUpdateList(addedSystem);
     }
 }

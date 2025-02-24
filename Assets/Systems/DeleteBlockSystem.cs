@@ -1,18 +1,19 @@
+using Unity.Entities;
 using UnityEngine;
 
-class DeleteBlock
+[DisableAutoCreation]
+partial class DeleteBlockSystem : SystemBase
 {
     HitObject _hitObject;
     BlockFactory _blockFactory;
 
-    public DeleteBlock(HitObject hitObject, BlockFactory blockFactory)
+    public DeleteBlockSystem(HitObject hitObject, BlockFactory blockFactory)
     {
         _hitObject = hitObject;
         _blockFactory = blockFactory;
     }
 
-    // Update is called once per frame
-    public void Update()
+    protected override void OnUpdate()
     {
         if (Input.GetKeyDown(KeyCode.Mouse1) && _hitObject.isCube)
         {
