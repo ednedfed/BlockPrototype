@@ -1,25 +1,21 @@
 using Unity.Entities;
 using Unity.Transforms;
-using UnityEngine;
 
+//todo: use linked entity for this?
 [DisableAutoCreation]
 [UpdateAfter(typeof(GhostPositionUpdateSystem))]
 partial class ParentCursorToGhostSystem : SystemBase
 {
-    GameObject _ghost;
-
-    public ParentCursorToGhostSystem(GameObject ghost)
-    {
-        _ghost = ghost;
-    }
-
     protected override void OnUpdate()
     {
-        foreach (var (cursorTags, localTranforms) in SystemAPI.Query<CursorTagComponent, RefRW<LocalTransform>>())
+        foreach (var (cursorTags, cursorLocalTranforms) in SystemAPI.Query<CursorTagComponent, RefRW<LocalTransform>>())
         {
-            //cursor is parented to ghost
-            localTranforms.ValueRW.Position = _ghost.transform.position;
-            localTranforms.ValueRW.Rotation = _ghost.transform.rotation;
+            foreach (var (ghostTags, ghostLocalTransforms) in SystemAPI.Query<GhostTagComponent, LocalTransform>())
+            {
+                //cursor is parented to ghost
+                cursorLocalTranforms.ValueRW.Position = ghostLocalTransforms.Position;
+                cursorLocalTranforms.ValueRW.Rotation = ghostLocalTransforms.Rotation;
+            }
         }
     }
 }

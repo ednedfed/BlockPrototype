@@ -2,5 +2,4 @@
 
 public struct CursorTagComponent : IComponentData
 {
-    Entity entity;
 }

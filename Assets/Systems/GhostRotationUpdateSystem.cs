@@ -4,22 +4,18 @@ using UnityEngine;
 [DisableAutoCreation]
 partial class GhostRotationUpdateSystem : SystemBase
 {
-    GhostBlockData _ghostBlockData;
-
-    public GhostRotationUpdateSystem(GhostBlockData ghostBlockData)
-    {
-        _ghostBlockData = ghostBlockData;
-    }
-
     protected override void OnUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
-            _ghostBlockData.direction++;
+        foreach (var ghostBlockData in SystemAPI.Query<RefRW<GhostBlockDataComponent>>())
+        {
+            if (Input.GetKeyDown(KeyCode.Q))
+                ghostBlockData.ValueRW.direction++;
 
-        if(Input.GetKeyDown(KeyCode.E))
-            _ghostBlockData.direction--;
+            if (Input.GetKeyDown(KeyCode.E))
+                ghostBlockData.ValueRW.direction--;
 
-        _ghostBlockData.direction += BlockGameConstants.GhostBlock.NumDirections;
-        _ghostBlockData.direction %= BlockGameConstants.GhostBlock.NumDirections;
+            ghostBlockData.ValueRW.direction += BlockGameConstants.GhostBlock.NumDirections;
+            ghostBlockData.ValueRW.direction %= BlockGameConstants.GhostBlock.NumDirections;
+        }
     }
 }

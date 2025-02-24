@@ -1,6 +1,7 @@
+using Unity.Entities;
 using UnityEngine;
 
-public class HitObject
+public struct HitObjectComponent : IComponentData
 {
     public RaycastHit raycastHit;
     public bool isCube;

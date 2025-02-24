@@ -1,31 +1,28 @@
 using Unity.Entities;
-using UnityEngine;
+using Unity.Transforms;
 
 [DisableAutoCreation]
 partial class GhostOverlappingSyncSystem : SystemBase
 {
-    GameObject _ghost;
-    HitObject _hitObject;
-
-    public GhostOverlappingSyncSystem(GameObject ghost, HitObject hitObject)
-    {
-        _ghost = ghost;
-        _hitObject = hitObject;
-    }
-
     protected override void OnUpdate()
     {
-        var ghostRenderer = _ghost.GetComponentInChildren<Renderer>();
-        if (ghostRenderer != null)
+        //todo: dots rendering must get implemented
+        foreach (var (ghostTags, hitObject, ghostLocalTransforms) in SystemAPI.Query<GhostTagComponent, HitObjectComponent, LocalTransform>())
         {
-            if (_hitObject.isOverlapping)
+            /*
+            var ghostRenderer = _ghost.GetComponentInChildren<Renderer>();
+            if (ghostRenderer != null)
             {
-                ghostRenderer.material.color = BlockGameConstants.GhostBlock.InvalidGhostColor;
+                if (_hitObject.isOverlapping)
+                {
+                    ghostRenderer.material.color = BlockGameConstants.GhostBlock.InvalidGhostColor;
+                }
+                else
+                {
+                    ghostRenderer.material.color = BlockGameConstants.GhostBlock.ValidGhostColor;
+                }
             }
-            else
-            {
-                ghostRenderer.material.color = BlockGameConstants.GhostBlock.ValidGhostColor;
-            }
+            */
         }
         /*
         var cursorRenderer = _cursor.GetComponentInChildren<Renderer>();
