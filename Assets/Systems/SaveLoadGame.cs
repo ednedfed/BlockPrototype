@@ -1,15 +1,22 @@
 using System.IO;
 using UnityEngine;
 
-public class SaveLoadGame : InjectableBehaviour
+class SaveLoadGame
 {
-    uint saveVersion = 0;
+    uint _saveVersion = 0;
 
     SaveData _saveData;
     BlockFactory _blockFactory;
 
+    public SaveLoadGame(uint saveVersion, SaveData saveData, BlockFactory blockFactory)
+    {
+        _saveVersion = saveVersion;
+        _saveData = saveData;
+        _blockFactory = blockFactory;
+    }
+
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         if (UnityEngine.Input.GetKeyDown(KeyCode.F5))
         {
@@ -17,7 +24,7 @@ public class SaveLoadGame : InjectableBehaviour
             {
                 using (BinaryWriter sw = new BinaryWriter(file))
                 {
-                    sw.Write(saveVersion);//version
+                    sw.Write(_saveVersion);//version
 
                     foreach (var cube in _saveData.placedCubes)
                     {

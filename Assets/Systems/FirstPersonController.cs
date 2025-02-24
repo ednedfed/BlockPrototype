@@ -1,18 +1,19 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-public class FirstPersonController : MonoBehaviour
+class FirstPersonController
 {
     public Rigidbody rb;
+    public Transform charTransform;
 
-    private void Start()
+    public void Start()
     {
         //don't have pointer waving around
         Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    public void FixedUpdate()
     {
         UpdateTranslation();
 
@@ -50,7 +51,7 @@ public class FirstPersonController : MonoBehaviour
             velocity.y -= 1;
         }
 
-        rb.linearVelocity = transform.rotation * velocity * BlockGameConstants.Drone.MoveSpeed * Time.deltaTime;
+        rb.linearVelocity = charTransform.rotation * velocity * BlockGameConstants.Drone.MoveSpeed * Time.deltaTime;
     }
 
     void UpdateRotation()
@@ -59,10 +60,10 @@ public class FirstPersonController : MonoBehaviour
 
         var delta3dx = new float3(0f, mouseDelta.x, 0f);
 
-        transform.Rotate(delta3dx, Space.World);
+        charTransform.Rotate(delta3dx, Space.World);
 
         var delta3dy = new float3(-mouseDelta.y, 0f, 0f);
 
-        transform.Rotate(delta3dy, Space.Self);
+        charTransform.Rotate(delta3dy, Space.Self);
     }
 }

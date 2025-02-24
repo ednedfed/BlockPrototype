@@ -1,21 +1,23 @@
 using UnityEngine;
 
-public class GhostRotation : MonoBehaviour
+class GhostRotation
 {
-    public GameObject cursor;
-    public GameObject ghost;
+    GhostBlockData _ghostBlockData;
 
-    public int direction;
+    public GhostRotation(GhostBlockData ghostBlockData)
+    {
+        _ghostBlockData = ghostBlockData;
+    }
 
-    void Update()
+    public void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))
-            direction++;
+            _ghostBlockData.direction++;
 
         if(Input.GetKeyDown(KeyCode.E))
-            direction--;
+            _ghostBlockData.direction--;
 
-        direction += BlockGameConstants.GhostBlock.NumDirections;
-        direction %= BlockGameConstants.GhostBlock.NumDirections;
+        _ghostBlockData.direction += BlockGameConstants.GhostBlock.NumDirections;
+        _ghostBlockData.direction %= BlockGameConstants.GhostBlock.NumDirections;
     }
 }

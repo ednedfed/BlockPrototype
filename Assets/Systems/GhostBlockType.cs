@@ -1,13 +1,20 @@
 ﻿using UnityEngine;
 
-public class GhostBlockType : InjectableBehaviour
+class GhostBlockType
 {
-    public GameObject ghost;
+    GameObject _ghost;
     
     GhostBlockData ghostBlockData;
     BlockTypes blockTypes;
 
-    void Update()
+    public GhostBlockType(GameObject ghost, GhostBlockData ghostBlockData, BlockTypes blockTypes)
+    {
+        _ghost = ghost;
+        this.ghostBlockData = ghostBlockData;
+        this.blockTypes = blockTypes;
+    }
+
+    public void Update()
     {
         uint desiredBlockType = ghostBlockData.blockType;
         for (int i = 0; i <= BlockGameConstants.GhostBlock.BlockTypeCount; ++i)
@@ -34,14 +41,17 @@ public class GhostBlockType : InjectableBehaviour
 
     void UpdateGhostPrefab(uint desiredBlockType)
     {
-        if (ghost.transform.childCount > 0)
+        if (_ghost.transform.childCount > 0)
         {
-            var child = ghost.transform.GetChild(0);
+            var child = _ghost.transform.GetChild(0);
 
             GameObject.Destroy(child.gameObject);
         }
 
-        //parent type to ghost
-        GameObject.Instantiate(blockTypes.ghostBlockPrefabs[desiredBlockType], ghost.transform);
+        if (blockTypes.ghostBlockPrefabs[desiredBlockType] != null)
+        {
+            //parent type to ghost
+            GameObject.Instantiate(blockTypes.ghostBlockPrefabs[desiredBlockType], _ghost.transform);
+        }
     }
 }

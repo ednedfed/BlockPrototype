@@ -1,18 +1,28 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-public class GhostPosition : InjectableBehaviour
+class GhostPosition
 {
-    public GameObject cursor;
-    public GameObject ghost;
-    public GhostRotation ghostRotation;
+    GameObject _character;
+    GameObject _cursor;
+    GameObject _ghost;
+    GhostBlockData _ghostBlockData;
 
     HitObject _hitObject;
 
-    void FixedUpdate()
+    public GhostPosition(GameObject character, GameObject cursor, GameObject ghost, GhostBlockData ghostBlockData, HitObject hitObject)
     {
-        Physics.Raycast(transform.position + transform.forward * BlockGameConstants.GhostBlock.StartRaycastDistance,
-            transform.forward, out var hitInfo,
+        _character = character;
+        _cursor = cursor;
+        _ghost = ghost;
+        _ghostBlockData = ghostBlockData;
+        _hitObject = hitObject;
+    }
+
+    public void FixedUpdate()
+    {
+        Physics.Raycast(_character.transform.position + _character.transform.forward * BlockGameConstants.GhostBlock.StartRaycastDistance,
+            _character.transform.forward, out var hitInfo,
             BlockGameConstants.GhostBlock.RaycastDistance, BlockGameConstants.GameLayers.InverseGhostLayerMask);
 
         _hitObject.raycastHit = hitInfo;
@@ -27,21 +37,21 @@ public class GhostPosition : InjectableBehaviour
                 (float3)_hitObject.raycastHit.normal * BlockGameConstants.BlockProperties.HalfCubeSize;
 
             //snap on surface, don't snap y
-            ghost.transform.position = math.floor(targetGhostPosition) +
+            _ghost.transform.position = math.floor(targetGhostPosition) +
                 new float3(BlockGameConstants.BlockProperties.HalfCubeSize, 0f, BlockGameConstants.BlockProperties.HalfCubeSize);
 
-            ghost.transform.up = _hitObject.raycastHit.normal;
+            _ghost.transform.up = _hitObject.raycastHit.normal;
 
-            ghost.transform.rotation *= Quaternion.AngleAxis(
-                ghostRotation.direction * BlockGameConstants.GhostBlock.DegreesPerTurn,
+            _ghost.transform.rotation *= Quaternion.AngleAxis(
+                _ghostBlockData.direction * BlockGameConstants.GhostBlock.DegreesPerTurn,
                 Vector3.up);
 
             //cursor is parented to ghost
-            cursor.transform.position = ghost.transform.position;
-            cursor.transform.rotation = ghost.transform.rotation;
+            _cursor.transform.position = _ghost.transform.position;
+            _cursor.transform.rotation = _ghost.transform.rotation;
         }
 
-        var ghostcollider = ghost.GetComponentInChildren<Collider>();
+        var ghostcollider = _ghost.GetComponentInChildren<Collider>();
         if (ghostcollider == null)
         {
             return;
@@ -50,24 +60,12 @@ public class GhostPosition : InjectableBehaviour
         var overlapCount = Physics.OverlapBoxNonAlloc(
             ghostcollider.transform.position,
             BlockGameConstants.BlockProperties.CubeHalfExtent,
-            resultsNoAlloc,
+            _resultsNoAlloc,
             ghostcollider.transform.rotation,
             BlockGameConstants.GameLayers.InverseGhostLayerMask);
 
         _hitObject.isOverlapping = overlapCount > 0;
-
-        //todo: extract this functionality
-        if (_hitObject.isOverlapping)
-        {
-            ghost.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.InvalidGhostColor;
-            cursor.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.InvalidCursorColor;
-        }
-        else
-        {
-            ghost.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.ValidGhostColor;
-            cursor.GetComponentInChildren<Renderer>().material.color = BlockGameConstants.GhostBlock.ValidCursorColor;
-        }
     }
 
-    Collider[] resultsNoAlloc = new Collider[1];
+    Collider[] _resultsNoAlloc = new Collider[1];
 }
