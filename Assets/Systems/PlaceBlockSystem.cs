@@ -2,7 +2,7 @@ using Unity.Entities;
 using UnityEngine;
 
 [DisableAutoCreation]
-partial class PlaceBlock : SystemBase
+partial class PlaceBlockSystem : SystemBase
 {
     GameObject _ghost;
 
@@ -10,7 +10,7 @@ partial class PlaceBlock : SystemBase
     GhostBlockData _ghostBlockData;
     BlockFactory _blockFactory;
 
-    public PlaceBlock(GameObject ghost, HitObject hitObject, GhostBlockData ghostBlockData, BlockFactory blockFactory)
+    public PlaceBlockSystem(GameObject ghost, HitObject hitObject, GhostBlockData ghostBlockData, BlockFactory blockFactory)
     {
         _ghost = ghost;
         _hitObject = hitObject;

@@ -25,15 +25,15 @@ public partial class MainGameContext : MonoBehaviour
 
         AddToWorldAndGroupSystemManaged(new DeleteBlockSystem(hitObject, blockFactory), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new GhostBlockTypeSyncSystem(ghost, ghostBlockData, blockTypes), world, simulationGroup);
-        AddToWorldAndGroupSystemManaged(new GhostRotation(ghostBlockData), world, simulationGroup);
-        AddToWorldAndGroupSystemManaged(new PlaceBlock(ghost, hitObject, ghostBlockData, blockFactory), world, simulationGroup);
-        AddToWorldAndGroupSystemManaged(new SaveLoadGame(0, saveData, blockFactory), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostRotationUpdateSystem(ghostBlockData), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new PlaceBlockSystem(ghost, hitObject, ghostBlockData, blockFactory), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new SaveLoadGameSystem(0, saveData, blockFactory), world, simulationGroup);
 
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
-        AddToWorldAndGroupSystemManaged(new FirstPersonController(character.GetComponent<Rigidbody>(), character.transform), world, fixedStepSimulationGroup);
-        AddToWorldAndGroupSystemManaged(new GhostPosition(character, cursor, ghost, ghostBlockData, hitObject), world, fixedStepSimulationGroup);
-        AddToWorldAndGroupSystemManaged(new GhostOverlappingSync(cursor, ghost, hitObject), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new FirstPersonControllerSystem(character.GetComponent<Rigidbody>(), character.transform), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostPositionUpdateSystem(character, cursor, ghost, ghostBlockData, hitObject), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostOverlappingSyncSystem(cursor, ghost, hitObject), world, fixedStepSimulationGroup);
 
         simulationGroup.SortSystems();
         fixedStepSimulationGroup.SortSystems();

@@ -3,12 +3,12 @@ using Unity.Mathematics;
 using UnityEngine;
 
 [DisableAutoCreation]
-partial class FirstPersonController : SystemBase
+partial class FirstPersonControllerSystem : SystemBase
 {
     Rigidbody _rb;
     Transform _charTransform;
 
-    public FirstPersonController(Rigidbody rb, Transform charTransform)
+    public FirstPersonControllerSystem(Rigidbody rb, Transform charTransform)
     {
         _rb = rb;
         _charTransform = charTransform;

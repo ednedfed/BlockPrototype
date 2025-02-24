@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 [DisableAutoCreation]
-partial class GhostPosition : SystemBase
+partial class GhostPositionUpdateSystem : SystemBase
 {
     GameObject _character;
     GameObject _cursor;
@@ -12,7 +12,7 @@ partial class GhostPosition : SystemBase
 
     HitObject _hitObject;
 
-    public GhostPosition(GameObject character, GameObject cursor, GameObject ghost, GhostBlockData ghostBlockData, HitObject hitObject)
+    public GhostPositionUpdateSystem(GameObject character, GameObject cursor, GameObject ghost, GhostBlockData ghostBlockData, HitObject hitObject)
     {
         _character = character;
         _cursor = cursor;

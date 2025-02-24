@@ -2,13 +2,13 @@ using Unity.Entities;
 using UnityEngine;
 
 [DisableAutoCreation]
-partial class GhostOverlappingSync : SystemBase
+partial class GhostOverlappingSyncSystem : SystemBase
 {
     GameObject _cursor;
     GameObject _ghost;
     HitObject _hitObject;
 
-    public GhostOverlappingSync(GameObject cursor, GameObject ghost, HitObject hitObject)
+    public GhostOverlappingSyncSystem(GameObject cursor, GameObject ghost, HitObject hitObject)
     {
         _cursor = cursor;
         _ghost = ghost;

@@ -3,14 +3,14 @@ using Unity.Entities;
 using UnityEngine;
 
 [DisableAutoCreation]
-partial class SaveLoadGame : SystemBase
+partial class SaveLoadGameSystem : SystemBase
 {
     uint _saveVersion = 0;
 
     SaveData _saveData;
     BlockFactory _blockFactory;
 
-    public SaveLoadGame(uint saveVersion, SaveData saveData, BlockFactory blockFactory)
+    public SaveLoadGameSystem(uint saveVersion, SaveData saveData, BlockFactory blockFactory)
     {
         _saveVersion = saveVersion;
         _saveData = saveData;

@@ -2,11 +2,11 @@ using Unity.Entities;
 using UnityEngine;
 
 [DisableAutoCreation]
-partial class GhostRotation : SystemBase
+partial class GhostRotationUpdateSystem : SystemBase
 {
     GhostBlockData _ghostBlockData;
 
-    public GhostRotation(GhostBlockData ghostBlockData)
+    public GhostRotationUpdateSystem(GhostBlockData ghostBlockData)
     {
         _ghostBlockData = ghostBlockData;
     }
