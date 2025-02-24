@@ -14,7 +14,7 @@ partial class GhostBlockTypeSyncSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        foreach (var (ghostBlockData, ghostLocalTransforms) in SystemAPI.Query<RefRW<GhostBlockDataComponent>, LocalTransform>())
+        foreach (var (ghostBlockData, ghostBlockPrefab, ghostLocalTransforms) in SystemAPI.Query<RefRW<GhostBlockDataComponent>, GhostBlockPrefabComponent, LocalTransform>())
         {
             uint desiredBlockType = ghostBlockData.ValueRO.blockType;
 
@@ -36,27 +36,32 @@ partial class GhostBlockTypeSyncSystem : SystemBase
                 ghostBlockData.ValueRW.blockType = desiredBlockType;
 
                 //update ghost
-                UpdateGhostPrefab(desiredBlockType, ghostLocalTransforms);
+                UpdateGhostPrefab(desiredBlockType, ghostLocalTransforms, ghostBlockPrefab);
+            }
+        }
+
+        //todo: figure out parenting
+        foreach (var (ghostBlockPrefab, ghostLocalTransforms) in SystemAPI.Query<GhostBlockPrefabComponent, LocalTransform>())
+        {
+            if (ghostBlockPrefab.ghostBlockPrefab != null)
+            {
+                ghostBlockPrefab.ghostBlockPrefab.transform.position = ghostLocalTransforms.Position;
+                ghostBlockPrefab.ghostBlockPrefab.transform.rotation = ghostLocalTransforms.Rotation;
             }
         }
     }
 
-    void UpdateGhostPrefab(uint desiredBlockType, LocalTransform ghostLocalTransforms)
+    void UpdateGhostPrefab(uint desiredBlockType, LocalTransform ghostLocalTransforms, GhostBlockPrefabComponent ghostBlockPrefab)
     {
-        //todo: figure out parenting mesh
-        /*
-        if (_ghost.transform.childCount > 0)
+        if (ghostBlockPrefab.ghostBlockPrefab != null)
         {
-            var child = _ghost.transform.GetChild(0);
-
-            GameObject.Destroy(child.gameObject);
+            GameObject.Destroy(ghostBlockPrefab.ghostBlockPrefab);
+            ghostBlockPrefab.ghostBlockPrefab = null;
         }
-        */
 
         if (_blockTypes.ghostBlockPrefabs[desiredBlockType] != null)
         {
-            //parent type to ghost
-            // GameObject.Instantiate(blockTypes.ghostBlockPrefabs[desiredBlockType], _ghost.transform);
+            ghostBlockPrefab.ghostBlockPrefab = GameObject.Instantiate(_blockTypes.ghostBlockPrefabs[desiredBlockType]);
         }
     }
 }

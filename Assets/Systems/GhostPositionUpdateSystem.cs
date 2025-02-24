@@ -48,25 +48,27 @@ partial class GhostPositionUpdateSystem : SystemBase
 
                 ghostLocalTransforms.ValueRW.Rotation = _ghostRotationTransform.rotation;
             }
+        }
 
-
-            //TODO
-            /*
-            var ghostcollider = _ghost.GetComponentInChildren<Collider>();
-            if (ghostcollider == null)
+        foreach (var (ghostBlockPrefab, hitObject) in SystemAPI.Query<GhostBlockPrefabComponent, RefRW<HitObjectComponent>>())
+        {
+            if (ghostBlockPrefab.ghostBlockPrefab != null)
             {
-                return;
+                var ghostcollider = ghostBlockPrefab.ghostBlockPrefab.GetComponentInChildren<Collider>();
+                if (ghostcollider == null)
+                {
+                    return;
+                }
+
+                var overlapCount = Physics.OverlapBoxNonAlloc(
+                    ghostcollider.transform.position,
+                    BlockGameConstants.BlockProperties.CubeHalfExtent,
+                    _resultsNoAlloc,
+                    ghostcollider.transform.rotation,
+                    BlockGameConstants.GameLayers.InverseGhostLayerMask);
+
+                hitObject.ValueRW.isOverlapping = overlapCount > 0;
             }
-
-            var overlapCount = Physics.OverlapBoxNonAlloc(
-                ghostcollider.transform.position,
-                BlockGameConstants.BlockProperties.CubeHalfExtent,
-                _resultsNoAlloc,
-                ghostcollider.transform.rotation,
-                BlockGameConstants.GameLayers.InverseGhostLayerMask);
-
-            _hitObject.isOverlapping = overlapCount > 0;
-            */
         }
     }
 
