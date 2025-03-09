@@ -30,18 +30,16 @@ partial class SaveLoadGameSystem : SystemBase
                     //todo: make entities?
                     foreach (var placedBlock in _placedBlockContainer.GetVales())
                     {
-                        var blockTransform = placedBlock.gameObject.transform;
-
                         sw.Write(placedBlock.blockType);
 
-                        sw.Write(blockTransform.position.x);
-                        sw.Write(blockTransform.position.y);
-                        sw.Write(blockTransform.position.z);
+                        sw.Write(placedBlock.position.x);
+                        sw.Write(placedBlock.position.y);
+                        sw.Write(placedBlock.position.z);
 
-                        sw.Write(blockTransform.rotation.x);
-                        sw.Write(blockTransform.rotation.y);
-                        sw.Write(blockTransform.rotation.z);
-                        sw.Write(blockTransform.rotation.w);
+                        sw.Write(placedBlock.rotation.x);
+                        sw.Write(placedBlock.rotation.y);
+                        sw.Write(placedBlock.rotation.z);
+                        sw.Write(placedBlock.rotation.w);
                     }
                 }
             }

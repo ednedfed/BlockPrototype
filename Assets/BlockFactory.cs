@@ -15,20 +15,16 @@ public class BlockFactory
 
     public void InstantiateBlock(uint blockType, Vector3 position, Quaternion rotation)
     {
+        //todo: replace prefabs with pure data
         if (blockType >= _blockTypes.blockPrefabs.Length || _blockTypes.blockPrefabs[blockType] == null)
             return;
 
-        GameObject placedBlock = GameObject.Instantiate(_blockTypes.blockPrefabs[blockType], position, rotation);
-
         //todo: this will become entity collection?
-        _saveData.Add(_idGen++, placedBlock, blockType);
+        _saveData.Add(_idGen++, blockType, position, rotation);
     }
 
     public void RemoveBlock(int blockId)
     {
-        //think about where to store game object reference
-        GameObject.Destroy(_saveData.GetBlockGameObject(blockId));
-
         _saveData.Remove(blockId);
     }
 

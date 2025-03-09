@@ -12,7 +12,7 @@ public partial class MainGameContext : MonoBehaviour
         //todo: also load static data?
         BlockTypes blockTypes = GameObject.FindFirstObjectByType<BlockTypes>();
 
-        PlacedBlockContainer placedBlockContainer = new PlacedBlockContainer();
+        PlacedBlockContainer placedBlockContainer = new PlacedBlockContainer(blockTypes);
         BlockFactory blockFactory = new BlockFactory(blockTypes, placedBlockContainer);
 
         //todo: totally custom world to exclude unnecessary sytems

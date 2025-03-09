@@ -7,29 +7,49 @@ public class PlacedBlockContainer
     {
         public int id;
         public uint blockType;
-        public GameObject gameObject;
+        public Vector3 position;
+        public Quaternion rotation;
     }
 
     Dictionary<int, PlacedBlockData> _placedCubes = new Dictionary<int, PlacedBlockData>();
-    Dictionary<GameObject, int> _idPerGameObject = new Dictionary<GameObject, int>();
 
-    public void Add(int blockId, GameObject blockGameObject, uint blockType)
+    //todo segregate game object management until it can be replaced
+    Dictionary<GameObject, int> _idPerGameObject = new Dictionary<GameObject, int>();
+    Dictionary<int, GameObject> _gameObjectPerId = new Dictionary<int, GameObject>();
+    BlockTypes _blockTypes;
+
+    public PlacedBlockContainer(BlockTypes blockTypes)
+    {
+        _blockTypes = blockTypes;
+    }
+
+    public void Add(int blockId, uint blockType, Vector3 position, Quaternion rotation)
     {
         _placedCubes.Add(blockId,
             new PlacedBlockData
             {
                 id = blockId,
-                gameObject = blockGameObject,
                 blockType = blockType,
+                position = position,
+                rotation = rotation
             }
         );
 
-        _idPerGameObject.Add(blockGameObject, blockId);
+        GameObject gameObject = GameObject.Instantiate(_blockTypes.blockPrefabs[blockType], position, rotation);
+
+        _gameObjectPerId.Add(blockId, gameObject);
+        _idPerGameObject.Add(gameObject, blockId);
     }
 
     public void Remove(int blockId)
     {
-        _idPerGameObject.Remove(_placedCubes[blockId].gameObject);
+        GameObject gaameObject = _gameObjectPerId[blockId];
+
+        GameObject.Destroy(gaameObject);
+
+        _gameObjectPerId.Remove(blockId);
+        _idPerGameObject.Remove(gaameObject);
+
         _placedCubes.Remove(blockId);
     }
 
@@ -43,18 +63,15 @@ public class PlacedBlockContainer
         return _idPerGameObject[root];
     }
 
-    public GameObject GetBlockGameObject(int blockId)
-    {
-        return _placedCubes[blockId].gameObject;
-    }
-
     public void Clear()
     {
-        foreach (var cube in _placedCubes)
+        foreach (var cube in _gameObjectPerId)
         {
             GameObject.Destroy(cube.Value.gameObject);
         }
 
+        _idPerGameObject.Clear();
+        _gameObjectPerId.Clear();
         _placedCubes.Clear();
     }
 
