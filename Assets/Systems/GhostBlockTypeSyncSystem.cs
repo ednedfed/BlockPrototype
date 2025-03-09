@@ -1,17 +1,21 @@
 ﻿using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DisableAutoCreation]
 partial class GhostBlockTypeSyncSystem : SystemBase
 {
     BlockTypes _blockTypes;
     PlacedBlockContainer _placedBlockContainer;
+    InputAction _pickBlockAction;
 
     public GhostBlockTypeSyncSystem(BlockTypes blockTypes, PlacedBlockContainer placedBlockContainer)
     {
         _blockTypes = blockTypes;
         _placedBlockContainer = placedBlockContainer;
+
+        _pickBlockAction = InputSystem.actions.FindAction("PickBlock");
     }
 
     protected override void OnUpdate()
@@ -20,7 +24,7 @@ partial class GhostBlockTypeSyncSystem : SystemBase
         {
             uint desiredBlockType = ghostBlockData.ValueRO.blockType;
 
-            if (Input.GetKey(KeyCode.Mouse2) && ghostHit.isCube)
+            if (_pickBlockAction.WasPressedThisFrame() && ghostHit.isCube)
             {
                 desiredBlockType = _placedBlockContainer.GetBlockType(ghostHit.hitBlockId);
             }

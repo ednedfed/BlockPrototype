@@ -1,17 +1,25 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DisableAutoCreation]
 partial class FirstPersonControllerSystem : SystemBase
 {
     Rigidbody _rb;
     Transform _charTransform;
+    InputAction _moveAction;
+    InputAction _jumpAction;
+    InputAction _crouchAction;
 
     public FirstPersonControllerSystem(Rigidbody rb, Transform charTransform)
     {
         _rb = rb;
         _charTransform = charTransform;
+
+        _moveAction = InputSystem.actions.FindAction("Move");
+        _jumpAction = InputSystem.actions.FindAction("Jump");
+        _crouchAction = InputSystem.actions.FindAction("Crouch");
     }
 
     protected override void OnCreate()
@@ -32,30 +40,16 @@ partial class FirstPersonControllerSystem : SystemBase
     private void UpdateTranslation(float deltaTime)
     {
         var velocity = float3.zero;
+        var moveVector = _moveAction.ReadValue<Vector2>();
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            velocity.z += 1;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            velocity.z -= 1;
-        }
+        velocity.z += moveVector.y;
+        velocity.x += moveVector.x;
 
-        if (Input.GetKey(KeyCode.A))
-        {
-            velocity.x -= 1;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            velocity.x += 1;
-        }
-
-        if (Input.GetKey(KeyCode.Space))
+        if (_jumpAction.IsPressed())
         {
             velocity.y += 1;
         }
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (_crouchAction.IsPressed())
         {
             velocity.y -= 1;
         }

@@ -1,19 +1,22 @@
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DisableAutoCreation]
 partial class GhostRotationUpdateSystem : SystemBase
 {
+    InputAction _rotateInput;
+
+    public GhostRotationUpdateSystem()
+    {
+        _rotateInput = InputSystem.actions.FindAction("Rotate");
+    }
+
     protected override void OnUpdate()
     {
         foreach (var ghostBlockData in SystemAPI.Query<RefRW<GhostBlockDataComponent>>())
         {
-            //todo: split input
-            if (Input.GetKeyDown(KeyCode.Q) || Input.mouseScrollDelta.y > 0)
-                ghostBlockData.ValueRW.direction++;
-
-            if (Input.GetKeyDown(KeyCode.E) || Input.mouseScrollDelta.y < 0)
-                ghostBlockData.ValueRW.direction--;
+            ghostBlockData.ValueRW.direction += Mathf.RoundToInt(_rotateInput.ReadValue<float>());
 
             ghostBlockData.ValueRW.direction += BlockGameConstants.GhostBlock.NumDirections;
             ghostBlockData.ValueRW.direction %= BlockGameConstants.GhostBlock.NumDirections;
