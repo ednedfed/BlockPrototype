@@ -7,13 +7,13 @@ partial class SaveLoadGameSystem : SystemBase
 {
     uint _saveVersion = 0;
 
-    SaveData _saveData;
+    PlacedBlockContainer _placedBlockContainer;
     BlockFactory _blockFactory;
 
-    public SaveLoadGameSystem(uint saveVersion, SaveData saveData, BlockFactory blockFactory)
+    public SaveLoadGameSystem(uint saveVersion, PlacedBlockContainer placedBlockContainer, BlockFactory blockFactory)
     {
         _saveVersion = saveVersion;
-        _saveData = saveData;
+        _placedBlockContainer = placedBlockContainer;
         _blockFactory = blockFactory;
     }
 
@@ -27,9 +27,9 @@ partial class SaveLoadGameSystem : SystemBase
                 {
                     sw.Write(_saveVersion);//version
 
-                    foreach (var cube in _saveData.placedCubes)
+                    //todo: make entities?
+                    foreach (var placedBlock in _placedBlockContainer.GetVales())
                     {
-                        var placedBlock = cube.Value;
                         var blockTransform = placedBlock.gameObject.transform;
 
                         sw.Write(placedBlock.blockType);
@@ -50,7 +50,7 @@ partial class SaveLoadGameSystem : SystemBase
         if (UnityEngine.Input.GetKeyDown(KeyCode.F6))
         {
             _blockFactory.ResetIdGen();
-            _saveData.Clear();
+            _placedBlockContainer.Clear();
 
             if (File.Exists(BlockGameConstants.SaveGame.SaveLocation) == false)
             {

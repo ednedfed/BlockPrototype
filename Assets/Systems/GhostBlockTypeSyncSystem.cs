@@ -6,17 +6,24 @@ using UnityEngine;
 partial class GhostBlockTypeSyncSystem : SystemBase
 {
     BlockTypes _blockTypes;
+    PlacedBlockContainer _placedBlockContainer;
 
-    public GhostBlockTypeSyncSystem(BlockTypes blockTypes)
+    public GhostBlockTypeSyncSystem(BlockTypes blockTypes, PlacedBlockContainer placedBlockContainer)
     {
         _blockTypes = blockTypes;
+        _placedBlockContainer = placedBlockContainer;
     }
 
     protected override void OnUpdate()
     {
-        foreach (var (ghostBlockData, ghostBlockPrefab, ghostLocalTransforms) in SystemAPI.Query<RefRW<GhostBlockDataComponent>, GhostBlockPrefabComponent, LocalTransform>())
+        foreach (var (ghostBlockData, ghostHit, ghostBlockPrefab, ghostLocalTransforms) in SystemAPI.Query<RefRW<GhostBlockDataComponent>, HitObjectComponent, GhostBlockPrefabComponent, LocalTransform>())
         {
             uint desiredBlockType = ghostBlockData.ValueRO.blockType;
+
+            if (Input.GetKey(KeyCode.Mouse2) && ghostHit.isCube)
+            {
+                desiredBlockType = _placedBlockContainer.GetBlockType(ghostHit.hitBlockId);
+            }
 
             for (int i = 0; i <= BlockGameConstants.GhostBlock.BlockTypeCount; ++i)
             {

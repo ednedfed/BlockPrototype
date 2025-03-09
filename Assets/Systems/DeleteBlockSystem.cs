@@ -17,11 +17,7 @@ partial class DeleteBlockSystem : SystemBase
         {
             if (Input.GetKeyDown(KeyCode.Mouse1) && hitObject.isCube)
             {
-                var block = hitObject.raycastHit.collider.transform.root.gameObject;
-
-                var blockId = block.GetComponent<BlockIdComponent>();
-
-                _blockFactory.RemoveBlock(blockId);
+                _blockFactory.RemoveBlock(hitObject.hitBlockId);
             }
         }
     }

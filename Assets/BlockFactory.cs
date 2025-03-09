@@ -3,11 +3,11 @@
 public class BlockFactory
 {
     readonly BlockTypes _blockTypes;
-    readonly SaveData _saveData;
+    readonly PlacedBlockContainer _saveData;
 
     int _idGen;
 
-    public BlockFactory(BlockTypes blockTypes, SaveData saveData)
+    public BlockFactory(BlockTypes blockTypes, PlacedBlockContainer saveData)
     {
         _blockTypes = blockTypes;
         _saveData = saveData;
@@ -18,28 +18,18 @@ public class BlockFactory
         if (blockType >= _blockTypes.blockPrefabs.Length || _blockTypes.blockPrefabs[blockType] == null)
             return;
 
-        //for now use all one material
         GameObject placedBlock = GameObject.Instantiate(_blockTypes.blockPrefabs[blockType], position, rotation);
-        var blockId = placedBlock.AddComponent<BlockIdComponent>();
-        blockId.blockId = _idGen++;
 
         //todo: this will become entity collection?
-        _saveData.placedCubes.Add(blockId.blockId,
-            new SaveData.PlacedBlockData
-            {
-                id = blockId.blockId,
-                gameObject = placedBlock,
-                blockType = blockType,
-            }
-        );
+        _saveData.Add(_idGen++, placedBlock, blockType);
     }
 
-    public void RemoveBlock(BlockIdComponent blockId)
+    public void RemoveBlock(int blockId)
     {
-        var placedBlock = _saveData.placedCubes[blockId.blockId];
-        _saveData.placedCubes.Remove(blockId.blockId);
+        //think about where to store game object reference
+        GameObject.Destroy(_saveData.GetBlockGameObject(blockId));
 
-        GameObject.Destroy(placedBlock.gameObject);
+        _saveData.Remove(blockId);
     }
 
     internal void ResetIdGen()

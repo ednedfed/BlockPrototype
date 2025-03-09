@@ -6,4 +6,5 @@ public struct HitObjectComponent : IComponentData
     public RaycastHit raycastHit;
     public bool isCube;
     public bool isOverlapping;
+    public int hitBlockId;
 }
