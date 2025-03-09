@@ -19,6 +19,7 @@ partial class SaveLoadGameSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        //todo: don't convert this yet because it's debug only, eventually make a save option in hud
         if (UnityEngine.Input.GetKeyDown(KeyCode.F5))
         {
             using (var file = new FileStream(BlockGameConstants.SaveGame.SaveLocation, FileMode.Create))

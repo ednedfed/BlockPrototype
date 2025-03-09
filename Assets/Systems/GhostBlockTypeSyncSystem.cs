@@ -9,7 +9,6 @@ partial class GhostBlockTypeSyncSystem : SystemBase
     BlockTypes _blockTypes;
     PlacedBlockContainer _placedBlockContainer;
     InputAction _pickBlockAction;
-
     public GhostBlockTypeSyncSystem(BlockTypes blockTypes, PlacedBlockContainer placedBlockContainer)
     {
         _blockTypes = blockTypes;
@@ -31,9 +30,10 @@ partial class GhostBlockTypeSyncSystem : SystemBase
 
             for (int i = 0; i <= BlockGameConstants.GhostBlock.BlockTypeCount; ++i)
             {
-                if (Input.GetKeyDown((KeyCode)(i + KeyCode.Alpha0)))
+                var action = InputSystem.actions.FindAction($"BlockType{i}");//todo: extract this if we keep action per slot
+                if (action != null && action.WasPressedThisFrame())
                 {
-                    desiredBlockType = (uint)i - 1;
+                    desiredBlockType = (uint)i;
                     break;
                 }
             }

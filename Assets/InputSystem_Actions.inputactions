@@ -121,6 +121,51 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "BlockType0",
+                    "type": "Button",
+                    "id": "e7cbe628-1764-4df4-a9eb-fd4824f3db2a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "BlockType1",
+                    "type": "Button",
+                    "id": "407b1169-81ff-4a1a-ab83-7dd7cd6de96a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "BlockType2",
+                    "type": "Button",
+                    "id": "f730b93a-a7a7-4692-b6c0-1dba83d7ffb4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "BlockType3",
+                    "type": "Button",
+                    "id": "abb8686a-a005-4ed5-901c-2ea5f523b8cb",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "BlockType4",
+                    "type": "Button",
+                    "id": "3eda8987-475a-454a-8748-3f15997102d6",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -572,6 +617,61 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "PickBlock",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "13831118-2509-4c47-8996-c4de8873e2e9",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BlockType0",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ab77885d-81fd-4322-bcc0-8c661b2e22c4",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BlockType1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "11a87a01-a3d4-4d31-a3b9-93f17180fd30",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BlockType2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ed824ca8-35f6-4000-9254-f11954ede285",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BlockType3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "58958f33-9390-4ae6-89e3-84ca8d0eecb8",
+                    "path": "<Keyboard>/5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BlockType4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
