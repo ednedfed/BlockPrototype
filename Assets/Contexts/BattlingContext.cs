@@ -30,6 +30,7 @@ public class BattlingContext : MonoBehaviour
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
         //todo: insert apply force methods here to control vehicle
+        AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer), world, fixedStepSimulationGroup);
 
         simulationGroup.SortSystems();
         fixedStepSimulationGroup.SortSystems();

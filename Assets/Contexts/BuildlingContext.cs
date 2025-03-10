@@ -41,7 +41,6 @@ public class BuildlingContext : MonoBehaviour
 
     static void AddToWorldAndGroupSystemManaged<T>(T system, World w, ComponentSystemGroup simulationGroup) where T : ComponentSystemBase
     {
-        var addedSystem = w.AddSystemManaged(system);
-        simulationGroup.AddSystemToUpdateList(addedSystem);
+        simulationGroup.AddSystemToUpdateList(w.AddSystemManaged(system));
     }
 }

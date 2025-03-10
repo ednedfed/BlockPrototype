@@ -567,7 +567,7 @@ GameObject:
   - component: {fileID: 873398560}
   - component: {fileID: 873398563}
   m_Layer: 0
-  m_Name: Character
+  m_Name: Character_TOREPLACEWITHECS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -828,7 +828,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   character: {fileID: 873398558}
-  blockTypes: {fileID: 0}
 --- !u!1 &1168729888
 GameObject:
   m_ObjectHideFlags: 0
@@ -1191,7 +1190,7 @@ GameObject:
   - component: {fileID: 1863074813}
   - component: {fileID: 1863074817}
   m_Layer: 0
-  m_Name: Floor
+  m_Name: Floor_TOREPLACEWITHECS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

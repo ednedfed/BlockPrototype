@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,5 +47,10 @@ public class BlockGameObjectContainer : IBlockFactoryListener
 
         _idPerGameObject.Clear();
         _gameObjectPerId.Clear();
+    }
+
+    public GameObject GetGameObject(int id)
+    {
+        return _gameObjectPerId[id];
     }
 }
