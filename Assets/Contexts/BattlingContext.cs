@@ -1,5 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class BattlingContext : MonoBehaviour
 {
@@ -29,8 +30,8 @@ public class BattlingContext : MonoBehaviour
 
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
-        //todo: insert apply force methods here to control vehicle
         AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new MachineControllerSystem(), world, fixedStepSimulationGroup);
 
         simulationGroup.SortSystems();
         fixedStepSimulationGroup.SortSystems();

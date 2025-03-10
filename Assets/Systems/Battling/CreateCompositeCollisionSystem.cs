@@ -27,6 +27,8 @@ partial class CreateCompositeCollisionSystem : SystemBase
         var blocks = _placedBlockContainer.GetVales();
         if (_created == false && blocks.Count > 0)
         {
+            Vector3 centreOfMass = Vector3.zero;
+
             NativeList<Unity.Physics.CompoundCollider.ColliderBlobInstance> children = new NativeList<Unity.Physics.CompoundCollider.ColliderBlobInstance>(blocks.Count, Allocator.Temp);
 
             foreach (var block in blocks)
@@ -53,6 +55,8 @@ partial class CreateCompositeCollisionSystem : SystemBase
                         }
                     );
                 }
+
+                centreOfMass += gameObject.transform.position;
             }
 
             var compoundCollider = Unity.Physics.CompoundCollider.Create(children.AsArray());
@@ -64,40 +68,46 @@ partial class CreateCompositeCollisionSystem : SystemBase
 
             children.Dispose();
 
-            CreateRigidbodyEntity(EntityManager, compoundCollider);
+            centreOfMass /= blocks.Count;
+
+            Entity entity = CreateRigidbodyEntity(EntityManager, compoundCollider, centreOfMass);
+
+            EntityManager.AddSharedComponent(entity, new MachineTagComponent());
 
             _created = true;
         }
     }
 
     //ensure all components are added that are needed
-    static void CreateRigidbodyEntity(EntityManager entityManager, BlobAssetReference<Unity.Physics.Collider> collider)
+    static Entity CreateRigidbodyEntity(EntityManager entityManager, BlobAssetReference<Unity.Physics.Collider> collider, Vector3 centreOfMass)
     {
         // Create a new entity with the combined collider
-        Entity combinedEntity = entityManager.CreateEntity();
-        entityManager.SetName(combinedEntity, "MachineRigidbody");
+        Entity rigidbodyEntity = entityManager.CreateEntity();
+        entityManager.SetName(rigidbodyEntity, "MachineRigidbody");
 
-        entityManager.AddComponentData(combinedEntity, new PhysicsCollider { Value = collider });
-        entityManager.AddComponentData(combinedEntity, new PhysicsMass { InverseMass = 1.0f });
-        entityManager.AddComponentData(combinedEntity, new LocalTransform { Position = float3.zero, Rotation = quaternion.identity, Scale = 1 });
+        entityManager.AddComponentData(rigidbodyEntity, new PhysicsCollider { Value = collider });
+        entityManager.AddComponentData(rigidbodyEntity, new PhysicsMass { InverseMass = 1.0f, CenterOfMass = centreOfMass});
+        entityManager.AddComponentData(rigidbodyEntity, new LocalTransform { Position = float3.zero, Rotation = quaternion.identity, Scale = 1 });
 
         // 3. PhysicsMass - Defines mass and inertia (automatic calculation for dynamic bodies)
-        entityManager.AddComponentData(combinedEntity, PhysicsMass.CreateDynamic(MassProperties.UnitSphere, 1f));
+        entityManager.AddComponentData(rigidbodyEntity, PhysicsMass.CreateDynamic(MassProperties.UnitSphere, 1f));
 
         // 4. PhysicsVelocity - Controls motion (set to zero initially)
-        entityManager.AddComponentData(combinedEntity, new PhysicsVelocity
+        entityManager.AddComponentData(rigidbodyEntity, new PhysicsVelocity
         {
             Linear = float3.zero,
             Angular = float3.zero
         });
 
         // 5. PhysicsDamping - Controls friction-like behavior (optional but recommended)
-        entityManager.AddComponentData(combinedEntity, new PhysicsDamping
+        entityManager.AddComponentData(rigidbodyEntity, new PhysicsDamping
         {
             Linear = 0.01f,   // Slows down linear motion
             Angular = 0.05f   // Slows down rotational motion
         });
 
-        entityManager.AddSharedComponent(combinedEntity, new PhysicsWorldIndex());
+        entityManager.AddSharedComponent(rigidbodyEntity, new PhysicsWorldIndex());
+
+        return rigidbodyEntity;
     }
 }
