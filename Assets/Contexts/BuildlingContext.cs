@@ -11,8 +11,12 @@ public class BuildlingContext : MonoBehaviour
     {
         var blockTypes = Resources.Load<BlockTypes>("ScriptableObjects/BlockTypes");
 
-        PlacedBlockContainer placedBlockContainer = new PlacedBlockContainer(blockTypes);
-        BlockFactory blockFactory = new BlockFactory(blockTypes, placedBlockContainer);
+        PlacedBlockContainer placedBlockContainer = new PlacedBlockContainer();
+        BlockGameObjectContainer blockGameObjectContainer = new BlockGameObjectContainer(blockTypes);
+
+        BlockFactory blockFactory = new BlockFactory(blockTypes);
+        blockFactory.RegisterBlockListener(placedBlockContainer);
+        blockFactory.RegisterBlockListener(blockGameObjectContainer);
 
         //todo: totally custom world to exclude unnecessary sytems
         var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
@@ -27,7 +31,7 @@ public class BuildlingContext : MonoBehaviour
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
         AddToWorldAndGroupSystemManaged(new FirstPersonControllerSystem(character.GetComponent<Rigidbody>(), character.transform), world, fixedStepSimulationGroup);
-        AddToWorldAndGroupSystemManaged(new GhostPositionUpdateSystem(character, placedBlockContainer), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new GhostPositionUpdateSystem(character, blockGameObjectContainer), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new GhostOverlappingSyncSystem(), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new ParentCursorToGhostSystem(), world, fixedStepSimulationGroup);
 

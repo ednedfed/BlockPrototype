@@ -7,12 +7,12 @@ using UnityEngine;
 partial class GhostPositionUpdateSystem : SystemBase
 {
     GameObject _character;
-    PlacedBlockContainer _placedBlockContainer;
+    BlockGameObjectContainer _blockGameObjectContainer;
 
-    public GhostPositionUpdateSystem(GameObject character, PlacedBlockContainer placedBlockContainer)
+    public GhostPositionUpdateSystem(GameObject character, BlockGameObjectContainer blockGameObjectContainer)
     {
         _character = character;
-        _placedBlockContainer = placedBlockContainer;
+        _blockGameObjectContainer = blockGameObjectContainer;
 
         GameObject gameObject = new GameObject("tmpGhostForCalculation");
         _ghostRotationTransform = gameObject.transform;
@@ -32,7 +32,7 @@ partial class GhostPositionUpdateSystem : SystemBase
 
             if (hitObject.ValueRW.isCube)
             {
-                hitObject.ValueRW.hitBlockId = _placedBlockContainer.GetBlockId(hitInfo.collider.transform.root.gameObject);
+                hitObject.ValueRW.hitBlockId = _blockGameObjectContainer.GetBlockId(hitInfo.collider.transform.root.gameObject);
             }
 
             if (hitObject.ValueRW.raycastHit.collider != null)

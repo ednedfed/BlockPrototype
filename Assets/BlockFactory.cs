@@ -1,16 +1,38 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public struct PlacedBlockData
+{
+    public int id;
+    public uint blockType;
+    public Vector3 position;
+    public Quaternion rotation;
+}
+
+public interface IBlockFactoryListener
+{
+    void OnAdd(PlacedBlockData blockData);
+    void OnRemove(int blockId);
+    void OnClear();
+}
 
 public class BlockFactory
 {
+    List<IBlockFactoryListener> _listeners;
+
     readonly BlockTypes _blockTypes;
-    readonly PlacedBlockContainer _saveData;
 
     int _idGen;
 
-    public BlockFactory(BlockTypes blockTypes, PlacedBlockContainer saveData)
+    public BlockFactory(BlockTypes blockTypes)
     {
+        _listeners = new List<IBlockFactoryListener>();
+
         _blockTypes = blockTypes;
-        _saveData = saveData;
+    }
+    public void RegisterBlockListener(IBlockFactoryListener listener)
+    {
+        _listeners.Add(listener);
     }
 
     public void InstantiateBlock(uint blockType, Vector3 position, Quaternion rotation)
@@ -19,17 +41,37 @@ public class BlockFactory
         if (blockType >= _blockTypes.blockDatas.Length || _blockTypes.blockDatas[blockType].buildPrefab == null)
             return;
 
-        //todo: this will become entity collection?
-        _saveData.Add(_idGen++, blockType, position, rotation);
+        var blockId = _idGen++;
+
+        var blockData = new PlacedBlockData
+        {
+            id = blockId,
+            blockType = blockType,
+            position = position,
+            rotation = rotation
+        };
+
+        foreach (var listener in _listeners)
+        {
+            listener.OnAdd(blockData);
+        }
     }
 
     public void RemoveBlock(int blockId)
     {
-        _saveData.Remove(blockId);
+        foreach (var listener in _listeners)
+        {
+            listener.OnRemove(blockId);
+        }
     }
 
-    internal void ResetIdGen()
+    public void Clear()
     {
         _idGen = 0;
+
+        foreach (var listener in _listeners)
+        {
+            listener.OnClear();
+        }
     }
 }
