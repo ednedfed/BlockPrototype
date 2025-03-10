@@ -38,7 +38,7 @@ partial class GhostBlockTypeSyncSystem : SystemBase
                 }
             }
 
-            if (desiredBlockType >= _blockTypes.ghostBlockPrefabs.Length)
+            if (desiredBlockType >= _blockTypes.blockDatas.Length)
                 return;
 
             //sync block type
@@ -54,25 +54,25 @@ partial class GhostBlockTypeSyncSystem : SystemBase
         //todo: figure out parenting
         foreach (var (ghostBlockPrefab, ghostLocalTransforms) in SystemAPI.Query<GhostBlockPrefabComponent, LocalTransform>())
         {
-            if (ghostBlockPrefab.ghostBlockPrefab != null)
+            if (ghostBlockPrefab.gameObject != null)
             {
-                ghostBlockPrefab.ghostBlockPrefab.transform.position = ghostLocalTransforms.Position;
-                ghostBlockPrefab.ghostBlockPrefab.transform.rotation = ghostLocalTransforms.Rotation;
+                ghostBlockPrefab.gameObject.transform.position = ghostLocalTransforms.Position;
+                ghostBlockPrefab.gameObject.transform.rotation = ghostLocalTransforms.Rotation;
             }
         }
     }
 
     void UpdateGhostPrefab(uint desiredBlockType, LocalTransform ghostLocalTransforms, GhostBlockPrefabComponent ghostBlockPrefab)
     {
-        if (ghostBlockPrefab.ghostBlockPrefab != null)
+        if (ghostBlockPrefab.gameObject != null)
         {
-            GameObject.Destroy(ghostBlockPrefab.ghostBlockPrefab);
-            ghostBlockPrefab.ghostBlockPrefab = null;
+            GameObject.Destroy(ghostBlockPrefab.gameObject);
+            ghostBlockPrefab.gameObject = null;
         }
 
-        if (_blockTypes.ghostBlockPrefabs[desiredBlockType] != null)
+        if (_blockTypes.blockDatas[desiredBlockType].ghostPrefab != null)
         {
-            ghostBlockPrefab.ghostBlockPrefab = GameObject.Instantiate(_blockTypes.ghostBlockPrefabs[desiredBlockType]);
+            ghostBlockPrefab.gameObject = GameObject.Instantiate(_blockTypes.blockDatas[desiredBlockType].ghostPrefab);
         }
     }
 }

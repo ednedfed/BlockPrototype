@@ -59,9 +59,9 @@ partial class GhostPositionUpdateSystem : SystemBase
 
         foreach (var (ghostBlockPrefab, hitObject) in SystemAPI.Query<GhostBlockPrefabComponent, RefRW<HitObjectComponent>>())
         {
-            if (ghostBlockPrefab.ghostBlockPrefab != null)
+            if (ghostBlockPrefab.gameObject != null)
             {
-                var ghostcollider = ghostBlockPrefab.ghostBlockPrefab.GetComponentInChildren<Collider>();
+                var ghostcollider = ghostBlockPrefab.gameObject.GetComponentInChildren<Collider>();
                 if (ghostcollider == null)
                 {
                     return;

@@ -35,7 +35,7 @@ public class PlacedBlockContainer
             }
         );
 
-        GameObject gameObject = GameObject.Instantiate(_blockTypes.blockPrefabs[blockType], position, rotation);
+        GameObject gameObject = GameObject.Instantiate(_blockTypes.blockDatas[blockType].buildPrefab, position, rotation);
 
         _gameObjectPerId.Add(blockId, gameObject);
         _idPerGameObject.Add(gameObject, blockId);

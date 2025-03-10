@@ -10,9 +10,9 @@ partial class GhostOverlappingSyncSystem : SystemBase
         //todo: dots rendering must get implemented
         foreach (var (ghostBlockPrefab, hitObject) in SystemAPI.Query<GhostBlockPrefabComponent, HitObjectComponent>())
         {
-            if (ghostBlockPrefab.ghostBlockPrefab != null)
+            if (ghostBlockPrefab.gameObject != null)
             {
-                var ghostRenderer = ghostBlockPrefab.ghostBlockPrefab.GetComponentInChildren<Renderer>();
+                var ghostRenderer = ghostBlockPrefab.gameObject.GetComponentInChildren<Renderer>();
                 if (ghostRenderer != null)
                 {
                     if (hitObject.isOverlapping)

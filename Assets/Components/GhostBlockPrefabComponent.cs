@@ -4,5 +4,5 @@ using UnityEngine;
 public class GhostBlockPrefabComponent : IComponentData
 {
     //todo: use dots rendering instead
-    public GameObject ghostBlockPrefab;
+    public GameObject gameObject;
 }

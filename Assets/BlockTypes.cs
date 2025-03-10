@@ -1,7 +1,16 @@
-﻿using UnityEngine;
+using System;
+using UnityEngine;
 
-public class BlockTypes : MonoBehaviour
+[CreateAssetMenu(fileName = "BlockTypes", menuName = "Scriptable Objects/BlockTypes")]
+public class BlockTypes : ScriptableObject
 {
-    public GameObject[] blockPrefabs;
-    public GameObject[] ghostBlockPrefabs;
+    public BlockTypesData[] blockDatas;
+}
+
+[Serializable]
+public struct BlockTypesData
+{
+    public GameObject buildPrefab;
+    public GameObject ghostPrefab;
+    public GameObject simulationPrefab;
 }
