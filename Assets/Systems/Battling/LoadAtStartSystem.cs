@@ -4,16 +4,21 @@ using Unity.Entities;
 partial class LoadAtStartSystem : SystemBase
 {
     BlockFactory _blockFactory;
+    bool _isLoaded;
 
     public LoadAtStartSystem(BlockFactory blockFactory)
     {
         _blockFactory = blockFactory;
+        _isLoaded = false;
     }
 
-    protected override void OnCreate()
+    protected override void OnUpdate() 
     {
-        LoadAndSaveUtility.LoadGame(_blockFactory);
-    }
+        if (_isLoaded == false)
+        {
+            _isLoaded = true;
 
-    protected override void OnUpdate() { }
+            LoadAndSaveUtility.LoadGame(_blockFactory);
+        }
+    }
 }

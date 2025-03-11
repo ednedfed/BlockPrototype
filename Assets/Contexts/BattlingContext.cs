@@ -10,6 +10,10 @@ public class BattlingContext : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
+        //todo: totally custom world to exclude unnecessary sytems?
+        var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
+        var simulationGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+
         var blockTypes = Resources.Load<BlockTypes>("ScriptableObjects/BlockTypes");
 
         RigidbodyEntityFactory rigidbodyEntityFactory = new RigidbodyEntityFactory();
@@ -20,12 +24,9 @@ public class BattlingContext : MonoBehaviour
         blockFactory.RegisterBlockListener(placedBlockContainer);
         blockFactory.RegisterBlockListener(blockGameObjectContainer);
 
-        //todo: totally custom world to exclude unnecessary sytems
-        var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
-        var simulationGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+        RegisterBlockEntityBuilder<WheelEntityBuilder>(world, simulationGroup, blockFactory, 2);
 
         //todo: parent camera, make an entity to drive
-
         AddToWorldAndGroupSystemManaged(new PlaceBlockSystem(blockFactory), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new LoadAtStartSystem(blockFactory), world, simulationGroup);
 
@@ -38,6 +39,14 @@ public class BattlingContext : MonoBehaviour
 
         simulationGroup.SortSystems();
         fixedStepSimulationGroup.SortSystems();
+    }
+
+    static void RegisterBlockEntityBuilder<T>(World world, SimulationSystemGroup simulationGroup, BlockFactory blockFactory, uint blockType)
+        where T : SystemBase, IBlockFactoryListener, new()
+    {
+        var builder = new T();
+        blockFactory.RegisterBlockListener(blockType, builder);
+        AddToWorldAndGroupSystemManaged(builder, world, simulationGroup);
     }
 
     static void AddToWorldAndGroupSystemManaged<T>(T system, World w, ComponentSystemGroup simulationGroup) where T : ComponentSystemBase

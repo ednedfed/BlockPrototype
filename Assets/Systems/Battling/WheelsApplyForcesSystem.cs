@@ -2,6 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Extensions;
+using Unity.Transforms;
 
 [DisableAutoCreation]
 [UpdateAfter(typeof(MachineControllerSystem))]
@@ -14,17 +15,20 @@ partial class WheelsApplyForcesSystem : SystemBase
         //todo: get wheels and apply force
         foreach (var playerInput in SystemAPI.Query<PlayerInputComponent>())
         {
-            foreach (var (velocityComponent, physicsMass, machineTag) in SystemAPI.Query<RefRW<PhysicsVelocity>, PhysicsMass, MachineTagComponent>())
+            foreach (var (machinePhysicsVelocity, machinePhysicsMass, machineTransform, machineTag) in SystemAPI.Query<RefRW<PhysicsVelocity>, PhysicsMass, LocalTransform, MachineTagComponent>())
             {
-                var velocity = float3.zero;
-                velocity.z += playerInput.moveVector.y;
+                foreach (var (wheelComponent, wheelTransform) in SystemAPI.Query<WheelComponent, LocalTransform>())
+                {
+                    var velocity = float3.zero;
+                    var angularVelocity = float3.zero;
 
-                var angularVelocity = float3.zero;
-                angularVelocity.y += playerInput.moveVector.x;
+                    velocity.z += playerInput.moveVector.y;
+                    velocity.x += playerInput.moveVector.x;
 
-                PhysicsComponentExtensions.ApplyLinearImpulse(ref velocityComponent.ValueRW, physicsMass, velocity);
+                    machinePhysicsVelocity.ValueRW.ApplyImpulse(machinePhysicsMass, machineTransform.Position, machineTransform.Rotation, velocity, wheelTransform.Position);
 
-                PhysicsComponentExtensions.ApplyAngularImpulse(ref velocityComponent.ValueRW, physicsMass, angularVelocity);
+                    PhysicsComponentExtensions.ApplyAngularImpulse(ref machinePhysicsVelocity.ValueRW, machinePhysicsMass, angularVelocity);
+                }
             }
         }
     }

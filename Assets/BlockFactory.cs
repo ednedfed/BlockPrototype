@@ -19,6 +19,7 @@ public interface IBlockFactoryListener
 public class BlockFactory
 {
     List<IBlockFactoryListener> _listeners;
+    List<IBlockFactoryListener>[] _listenersPerType;
 
     readonly BlockTypes _blockTypes;
 
@@ -26,13 +27,24 @@ public class BlockFactory
 
     public BlockFactory(BlockTypes blockTypes)
     {
-        _listeners = new List<IBlockFactoryListener>();
-
         _blockTypes = blockTypes;
+
+        _listeners = new List<IBlockFactoryListener>();
+        _listenersPerType = new List<IBlockFactoryListener>[_blockTypes.blockDatas.Length];
+
+        for (int i = 0; i < _listenersPerType.Length; ++i)
+        { 
+            _listenersPerType[i] = new List<IBlockFactoryListener>();
+        }
     }
     public void RegisterBlockListener(IBlockFactoryListener listener)
     {
         _listeners.Add(listener);
+    }
+
+    public void RegisterBlockListener(uint blockType, IBlockFactoryListener listener)
+    {
+        _listenersPerType[blockType].Add(listener);
     }
 
     public void InstantiateBlock(uint blockType, Vector3 position, Quaternion rotation)
@@ -55,6 +67,11 @@ public class BlockFactory
         {
             listener.OnAdd(blockData);
         }
+
+        foreach (var listener in _listenersPerType[blockType])
+        {
+            listener.OnAdd(blockData);
+        }
     }
 
     public void RemoveBlock(int blockId)
@@ -62,6 +79,15 @@ public class BlockFactory
         foreach (var listener in _listeners)
         {
             listener.OnRemove(blockId);
+        }
+
+        //todo: don't know types
+        foreach (var listeners in _listenersPerType)
+        {
+            foreach (var listener in listeners)
+            {
+                listener.OnRemove(blockId);
+            }
         }
     }
 
@@ -72,6 +98,15 @@ public class BlockFactory
         foreach (var listener in _listeners)
         {
             listener.OnClear();
+        }
+
+        //all types
+        foreach (var listeners in _listenersPerType)
+        {
+            foreach (var listener in listeners)
+            {
+                listener.OnClear();
+            }
         }
     }
 }
