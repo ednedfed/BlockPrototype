@@ -338,6 +338,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2782006247013331858, guid: 58b87e68f204622459c37beda9c53138, type: 3}
+      propertyPath: DrawContacts
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2782006247013331858, guid: 58b87e68f204622459c37beda9c53138, type: 3}
+      propertyPath: DrawMassProperties
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3419594419475784285, guid: 58b87e68f204622459c37beda9c53138, type: 3}
       propertyPath: m_Name
       value: PhysicsSettings

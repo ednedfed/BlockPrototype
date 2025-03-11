@@ -28,7 +28,7 @@ public class BattlingContext : MonoBehaviour
 
         AddToWorldAndGroupSystemManaged(new PlaceBlockSystem(blockFactory), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new LoadAtStartSystem(blockFactory), world, simulationGroup);
-        AddToWorldAndGroupSystemManaged(new ParentCameraToMachineSystem(), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new ParentCameraToMachineSystem(Camera.main.transform.parent), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new ParentGameObjectToMachineSystem(blockGameObjectContainer, placedBlockContainer), world, simulationGroup);
         
 

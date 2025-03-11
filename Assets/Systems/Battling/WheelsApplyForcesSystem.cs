@@ -23,7 +23,7 @@ partial class WheelsApplyForcesSystem : SystemBase
                     var angularVelocity = float3.zero;
 
                     //forward back
-                    velocity.z += playerInput.moveVector.y;
+                    velocity.z += playerInput.moveVector.y * deltaTime * 10f;
 
                     if (math.abs(playerInput.moveVector.x) < 0.001f)
                         wheelComponent.ValueRW.currentSteerAngle *= 0.7f;
@@ -49,17 +49,18 @@ partial class WheelsApplyForcesSystem : SystemBase
 
                     velocity = math.mul(steerRotation, velocity);
 
-                    UnityEngine.Debug.DrawRay(wheelWorldPosition, velocity, UnityEngine.Color.yellow, deltaTime);
-
                     //todo: friction etx
 
                     //note: this point is worldspace
                     machinePhysicsVelocity.ValueRW.ApplyImpulse(machinePhysicsMass, machineTransform.Position, machineTransform.Rotation, velocity, wheelWorldPosition);
 
+                    UnityEngine.Debug.DrawRay(wheelWorldPosition, velocity, UnityEngine.Color.yellow, deltaTime);
+                    /*
                     var speedsq = math.lengthsq(machinePhysicsVelocity.ValueRW.Linear);
                     if (speedsq >= 1f)
                     {
                         machinePhysicsVelocity.ValueRW.Linear /= math.sqrt(speedsq);
+                        machinePhysicsVelocity.ValueRW.Linear *= 1f;
                     }
 
                     speedsq = math.lengthsq(machinePhysicsVelocity.ValueRW.Angular);
@@ -68,7 +69,7 @@ partial class WheelsApplyForcesSystem : SystemBase
                         machinePhysicsVelocity.ValueRW.Angular /= math.sqrt(speedsq);
                         machinePhysicsVelocity.ValueRW.Angular *= 0.1f;
                     }
-
+                    */
                     DebugDraw.DrawTransformFrame(wheelWorldPosition, wheelWorldRotation, deltaTime);
                 }
             }

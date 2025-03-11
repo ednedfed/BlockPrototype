@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [DisableAutoCreation]
 partial class CreateCompositeCollisionSystem : SystemBase
@@ -42,27 +44,38 @@ partial class CreateCompositeCollisionSystem : SystemBase
         {
             var gameObject = _blockGameObjectContainer.GetGameObject(block.id);
             var collider = gameObject.GetComponentInChildren<UnityEngine.Collider>();
+            BlobAssetReference<Unity.Physics.Collider> boxColliderEcs = default;
 
             //todo: once blocks are entities, use correct collider type
-            if (collider is UnityEngine.BoxCollider)
+            if (block.blockType == 2)
             {
                 UnityEngine.BoxCollider boxCollider = (UnityEngine.BoxCollider)collider;
-
-                var boxColliderEcs = Unity.Physics.BoxCollider.Create(new Unity.Physics.BoxGeometry()
+                boxColliderEcs = Unity.Physics.SphereCollider.Create(new Unity.Physics.SphereGeometry()
                 {
                     Center = boxCollider.center,
-                    Size = boxCollider.size,
-                    Orientation = Unity.Mathematics.quaternion.identity
+                    Radius = boxCollider.size.x * collider.transform.lossyScale.x * 0.5f,
                 });
 
-                children.Add(
-                    new Unity.Physics.CompoundCollider.ColliderBlobInstance
-                    {
-                        Collider = boxColliderEcs,
-                        CompoundFromChild = new Unity.Mathematics.RigidTransform(gameObject.transform.rotation, gameObject.transform.position)
-                    }
-                );
+                boxColliderEcs.Value.SetFriction(5f);
             }
+            else if (collider is UnityEngine.BoxCollider)
+            {
+                UnityEngine.BoxCollider boxCollider = (UnityEngine.BoxCollider)collider;
+                boxColliderEcs = Unity.Physics.BoxCollider.Create(new Unity.Physics.BoxGeometry()
+                {
+                    Center = boxCollider.center,
+                    Size = (float3)boxCollider.size * (float3)collider.transform.lossyScale,
+                    Orientation = Unity.Mathematics.quaternion.identity
+                });
+            }
+
+            children.Add(
+                new Unity.Physics.CompoundCollider.ColliderBlobInstance
+                {
+                    Collider = boxColliderEcs,
+                    CompoundFromChild = new Unity.Mathematics.RigidTransform(gameObject.transform.rotation, gameObject.transform.position),
+                }
+            );
 
             centreOfMass += gameObject.transform.position;
         }
