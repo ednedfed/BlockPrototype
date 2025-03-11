@@ -6,6 +6,10 @@ public abstract class BlockGameConstants
     public static class Drone
     {
         public const float MoveSpeed = 500f;
+    }
+
+    public static class Camera
+    {
         public const float RotateSpeed = 0.3f;
     }
 

@@ -3,7 +3,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Extensions;
 using Unity.Transforms;
-using UnityEngine.UIElements;
 
 [DisableAutoCreation]
 [UpdateAfter(typeof(MachineControllerSystem))]

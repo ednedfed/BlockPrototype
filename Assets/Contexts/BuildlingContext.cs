@@ -31,6 +31,7 @@ public class BuildlingContext : MonoBehaviour
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
         AddToWorldAndGroupSystemManaged(new FirstPersonControllerSystem(character.GetComponent<Rigidbody>(), character.transform), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new MouseLookRotationSystem(character.transform), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new GhostPositionUpdateSystem(character, blockGameObjectContainer), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new GhostOverlappingSyncSystem(), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new ParentCursorToGhostSystem(), world, fixedStepSimulationGroup);
