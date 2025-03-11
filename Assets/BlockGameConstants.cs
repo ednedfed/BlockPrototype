@@ -11,6 +11,7 @@ public abstract class BlockGameConstants
     public static class Camera
     {
         public const float RotateSpeed = 0.3f;
+        public readonly static float3 MachineOffset = new float3(0f, 2f, -8f);
     }
 
     public static class GhostBlock
@@ -57,6 +58,6 @@ public abstract class BlockGameConstants
     public static class SaveGame
     {
         const string FileName = "/save.bin";
-        public static readonly string SaveLocation = Application.persistentDataPath + FileName;
+        public readonly static string SaveLocation = Application.persistentDataPath + FileName;
     }
 }
