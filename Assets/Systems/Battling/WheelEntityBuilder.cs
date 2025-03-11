@@ -20,8 +20,11 @@ public partial class WheelEntityBuilder : SystemBase, IBlockFactoryListener
 
         //todo: machine id component?
         EntityManager.AddComponentData(newEntity, new BlockIdComponent() { blockId = blockData.id });
-        EntityManager.AddComponentData(newEntity, new WheelComponent());//todo: can put stats on this component
-        EntityManager.AddComponentData(newEntity, new LocalTransform() { Position = blockData.position, Rotation = blockData.rotation });
+        EntityManager.AddComponentData(newEntity, new WheelComponent()
+        {
+            maxSteerAngle = 30f,
+        });
+        EntityManager.AddComponentData(newEntity, new LocalTransform() { Position = blockData.position, Rotation = blockData.rotation, Scale = 1f });
 
         _wheelEntities.Add(blockData.id, newEntity);
     }

@@ -15,11 +15,12 @@ public class RigidbodyEntityFactory
         entityManager.SetName(rigidbodyEntity, entityName);
 
         entityManager.AddComponentData(rigidbodyEntity, new PhysicsCollider { Value = collider });
-        entityManager.AddComponentData(rigidbodyEntity, new PhysicsMass { InverseMass = 1.0f, CenterOfMass = centreOfMass });
-        entityManager.AddComponentData(rigidbodyEntity, new LocalTransform { Position = float3.zero, Rotation = quaternion.identity, Scale = 1 });
+        entityManager.AddComponentData(rigidbodyEntity, new LocalTransform { Position = float3.zero, Rotation = quaternion.identity, Scale = 1f });
 
         // 3. PhysicsMass - Defines mass and inertia (automatic calculation for dynamic bodies)
-        entityManager.AddComponentData(rigidbodyEntity, PhysicsMass.CreateDynamic(MassProperties.UnitSphere, 1f));
+        var physicsMass = PhysicsMass.CreateDynamic(MassProperties.CreateBox(collider.Value.CalculateAabb().Extents), 1f);
+        physicsMass.CenterOfMass = centreOfMass;
+        entityManager.AddComponentData(rigidbodyEntity, physicsMass);
 
         // 4. PhysicsVelocity - Controls motion (set to zero initially)
         entityManager.AddComponentData(rigidbodyEntity, new PhysicsVelocity
