@@ -1,7 +1,4 @@
 using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Physics;
-using Unity.Physics.Extensions;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,27 +22,9 @@ partial class MachineControllerSystem : SystemBase
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
 
-        UpdateTranslation(deltaTime);
-    }
-
-    private void UpdateTranslation(float deltaTime)
-    {
-        var velocity = float3.zero;
-        var moveVector = _moveAction.ReadValue<Vector2>();
-
-        velocity.z += moveVector.y;
-
-
-        var angularVelocity = float3.zero;
-        angularVelocity.y += moveVector.x;
-
-        //todo: get wheels and apply force
-
-        foreach (var (velocityComponent, physicsMass, machineTag) in SystemAPI.Query<RefRW<PhysicsVelocity>, PhysicsMass, MachineTagComponent>())
+        foreach (var playerInput in SystemAPI.Query<RefRW<PlayerInputComponent>>())
         {
-            PhysicsComponentExtensions.ApplyLinearImpulse(ref velocityComponent.ValueRW, physicsMass, velocity);
-
-            PhysicsComponentExtensions.ApplyAngularImpulse(ref velocityComponent.ValueRW, physicsMass, angularVelocity);
+            playerInput.ValueRW.moveVector = _moveAction.ReadValue<Vector2>();
         }
     }
 }

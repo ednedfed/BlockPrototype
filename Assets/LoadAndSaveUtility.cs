@@ -52,7 +52,7 @@ public static class LoadAndSaveUtility
                 sw.Write(saveVersion);//version
 
                 //todo: make entities?
-                foreach (var placedBlock in placedBlockContainer.GetVales())
+                foreach (var placedBlock in placedBlockContainer.GetValues())
                 {
                     sw.Write(placedBlock.blockType);
 

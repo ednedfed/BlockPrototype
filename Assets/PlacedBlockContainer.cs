@@ -25,7 +25,7 @@ public class PlacedBlockContainer : IBlockFactoryListener
         _placedCubes.Clear();
     }
 
-    public Dictionary<int, PlacedBlockData>.ValueCollection GetVales()
+    public Dictionary<int, PlacedBlockData>.ValueCollection GetValues()
     {
         return _placedCubes.Values;
     }

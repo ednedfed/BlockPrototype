@@ -12,6 +12,7 @@ public class BattlingContext : MonoBehaviour
     {
         var blockTypes = Resources.Load<BlockTypes>("ScriptableObjects/BlockTypes");
 
+        RigidbodyEntityFactory rigidbodyEntityFactory = new RigidbodyEntityFactory();
         PlacedBlockContainer placedBlockContainer = new PlacedBlockContainer();
         BlockGameObjectContainer blockGameObjectContainer = new BlockGameObjectContainer(blockTypes);
 
@@ -30,8 +31,10 @@ public class BattlingContext : MonoBehaviour
 
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
-        AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer, rigidbodyEntityFactory), world, fixedStepSimulationGroup);
+
         AddToWorldAndGroupSystemManaged(new MachineControllerSystem(), world, fixedStepSimulationGroup);
+        AddToWorldAndGroupSystemManaged(new WheelsApplyForcesSystem(), world, fixedStepSimulationGroup);
 
         simulationGroup.SortSystems();
         fixedStepSimulationGroup.SortSystems();
