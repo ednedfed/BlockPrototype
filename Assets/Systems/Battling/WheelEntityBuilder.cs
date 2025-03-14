@@ -25,6 +25,7 @@ public partial class WheelEntityBuilder : SystemBase, IBlockFactoryListenerWithC
         EntityManager.AddComponentData(newEntity, new WheelComponent()
         {
             maxSteerAngle = 30f,
+            radius = 0.75f
         });
         EntityManager.AddComponentData(newEntity, new LocalTransform() { Position = blockData.position, Rotation = blockData.rotation, Scale = 1f });
 

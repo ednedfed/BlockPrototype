@@ -38,11 +38,8 @@ partial class ParentGameObjectToMachineSystem : SystemBase
                 var instance = _blockGameObjectContainer.GetGameObject(blockIdComponent.blockId);
                 instance.transform.rotation *= additionalRotationWorldspace;
 
-                //todo: will be stored in component
-                /*
-                var placeholderTyreRot = quaternion.AxisAngle(math.up(), (float)SystemAPI.Time.ElapsedTime);
+                var placeholderTyreRot = quaternion.AxisAngle(math.up(), wheelComponent.axisRotation);
                 instance.transform.rotation *= placeholderTyreRot;
-                */
             }
         }
     }

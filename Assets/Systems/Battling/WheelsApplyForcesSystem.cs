@@ -49,27 +49,18 @@ partial class WheelsApplyForcesSystem : SystemBase
 
                     velocity = math.mul(steerRotation, velocity);
 
+                    var wheelForward = math.cross(machineTransform.Up(), math.mul(wheelWorldRotation, math.up()));
+
+                    var invRadius = 1f / wheelComponent.ValueRW.radius;
+                    wheelComponent.ValueRW.axisRotation -= math.dot(machinePhysicsVelocity.ValueRO.Linear, wheelForward) * invRadius * deltaTime;
+
                     //todo: friction etx
 
                     //note: this point is worldspace
                     machinePhysicsVelocity.ValueRW.ApplyImpulse(machinePhysicsMass, machineTransform.Position, machineTransform.Rotation, velocity, wheelWorldPosition);
 
                     UnityEngine.Debug.DrawRay(wheelWorldPosition, velocity, UnityEngine.Color.yellow, deltaTime);
-                    /*
-                    var speedsq = math.lengthsq(machinePhysicsVelocity.ValueRW.Linear);
-                    if (speedsq >= 1f)
-                    {
-                        machinePhysicsVelocity.ValueRW.Linear /= math.sqrt(speedsq);
-                        machinePhysicsVelocity.ValueRW.Linear *= 1f;
-                    }
 
-                    speedsq = math.lengthsq(machinePhysicsVelocity.ValueRW.Angular);
-                    if (speedsq >= 0.1f)
-                    {
-                        machinePhysicsVelocity.ValueRW.Angular /= math.sqrt(speedsq);
-                        machinePhysicsVelocity.ValueRW.Angular *= 0.1f;
-                    }
-                    */
                     DebugDraw.DrawTransformFrame(wheelWorldPosition, wheelWorldRotation, deltaTime);
                 }
             }
