@@ -1,6 +1,5 @@
 using Unity.Entities;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public class BattlingContext : MonoBehaviour
 {
@@ -24,7 +23,7 @@ public class BattlingContext : MonoBehaviour
         blockFactory.RegisterBlockListener(placedBlockContainer);
         blockFactory.RegisterBlockListener(blockGameObjectContainer);
 
-        RegisterBlockEntityBuilder<WheelEntityBuilder>(world, simulationGroup, blockFactory, 2);
+        RegisterBlockEntityBuilder<WheelEntityBuilder>(world, simulationGroup, blockFactory);
 
         AddToWorldAndGroupSystemManaged(new PlaceBlockSystem(blockFactory), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new LoadAtStartSystem(blockFactory), world, simulationGroup);
@@ -46,11 +45,11 @@ public class BattlingContext : MonoBehaviour
         fixedStepSimulationGroup.SortSystems();
     }
 
-    static void RegisterBlockEntityBuilder<T>(World world, SimulationSystemGroup simulationGroup, BlockFactory blockFactory, uint blockType)
-        where T : SystemBase, IBlockFactoryListener, new()
+    static void RegisterBlockEntityBuilder<T>(World world, SimulationSystemGroup simulationGroup, BlockFactory blockFactory)
+        where T : SystemBase, IBlockFactoryListenerWithCategory, new()
     {
         var builder = new T();
-        blockFactory.RegisterBlockListener(blockType, builder);
+        blockFactory.RegisterBlockListenerWithCategory(builder);
         AddToWorldAndGroupSystemManaged(builder, world, simulationGroup);
     }
 

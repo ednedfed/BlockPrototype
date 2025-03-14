@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [DisableAutoCreation]
 partial class CreateCompositeCollisionSystem : SystemBase
@@ -47,7 +46,7 @@ partial class CreateCompositeCollisionSystem : SystemBase
             BlobAssetReference<Unity.Physics.Collider> boxColliderEcs = default;
 
             //todo: once blocks are entities, use correct collider type
-            if (block.blockType == 2)
+            if (block.blockCategory == BlockCategory.Wheel)
             {
                 UnityEngine.BoxCollider boxCollider = (UnityEngine.BoxCollider)collider;
                 boxColliderEcs = Unity.Physics.SphereCollider.Create(new Unity.Physics.SphereGeometry()
@@ -60,6 +59,7 @@ partial class CreateCompositeCollisionSystem : SystemBase
             }
             else if (collider is UnityEngine.BoxCollider)
             {
+                //todo: add primitive shape varieties
                 UnityEngine.BoxCollider boxCollider = (UnityEngine.BoxCollider)collider;
                 boxColliderEcs = Unity.Physics.BoxCollider.Create(new Unity.Physics.BoxGeometry()
                 {

@@ -10,7 +10,15 @@ public class BlockTypes : ScriptableObject
 [Serializable]
 public struct BlockTypesData
 {
+    public BlockCategory blockCategory;
     public GameObject buildPrefab;
     public GameObject ghostPrefab;
     public GameObject simulationPrefab;
+}
+
+public enum BlockCategory
+{ 
+    Primitive,
+    Wheel,
+    Laser,
 }

@@ -184,6 +184,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6209828994140461256, guid: a2bc98d1d350a1243abd4183ae6f615e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7158857937642944909, guid: a2bc98d1d350a1243abd4183ae6f615e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -227,6 +231,10 @@ PrefabInstance:
     - target: {fileID: 9141590458473767292, guid: a2bc98d1d350a1243abd4183ae6f615e, type: 3}
       propertyPath: m_Name
       value: Floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 9141590458473767292, guid: a2bc98d1d350a1243abd4183ae6f615e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

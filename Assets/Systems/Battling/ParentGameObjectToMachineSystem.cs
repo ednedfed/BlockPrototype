@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEditor.Rendering;
 
 [DisableAutoCreation]
 partial class ParentGameObjectToMachineSystem : SystemBase
@@ -36,6 +37,12 @@ partial class ParentGameObjectToMachineSystem : SystemBase
 
                 var instance = _blockGameObjectContainer.GetGameObject(blockIdComponent.blockId);
                 instance.transform.rotation *= additionalRotationWorldspace;
+
+                //todo: will be stored in component
+                /*
+                var placeholderTyreRot = quaternion.AxisAngle(math.up(), (float)SystemAPI.Time.ElapsedTime);
+                instance.transform.rotation *= placeholderTyreRot;
+                */
             }
         }
     }

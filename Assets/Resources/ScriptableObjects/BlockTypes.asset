@@ -13,15 +13,19 @@ MonoBehaviour:
   m_Name: BlockTypes
   m_EditorClassIdentifier: 
   blockDatas:
-  - buildPrefab: {fileID: 0}
+  - blockCategory: 0
+    buildPrefab: {fileID: 0}
     ghostPrefab: {fileID: 0}
     simulationPrefab: {fileID: 0}
-  - buildPrefab: {fileID: 7945517330385963159, guid: 34820e8e535237748bee60e7e4e9e627, type: 3}
+  - blockCategory: 0
+    buildPrefab: {fileID: 7945517330385963159, guid: 34820e8e535237748bee60e7e4e9e627, type: 3}
     ghostPrefab: {fileID: 2212632972408944476, guid: d2a150e4960bf6f4aa7504da32f3df2f, type: 3}
     simulationPrefab: {fileID: 0}
-  - buildPrefab: {fileID: 7945517330385963159, guid: d2571b02fb2fa3f4281e2ceeb81cbe7e, type: 3}
+  - blockCategory: 1
+    buildPrefab: {fileID: 7945517330385963159, guid: d2571b02fb2fa3f4281e2ceeb81cbe7e, type: 3}
     ghostPrefab: {fileID: 2037241536715464968, guid: f54fa42b504820646a195ceb8b249a8b, type: 3}
     simulationPrefab: {fileID: 0}
-  - buildPrefab: {fileID: 9025376940047347909, guid: db0befce2d0492c41b0a26b1df163138, type: 3}
+  - blockCategory: 2
+    buildPrefab: {fileID: 9025376940047347909, guid: db0befce2d0492c41b0a26b1df163138, type: 3}
     ghostPrefab: {fileID: 7945517330385963159, guid: 6012e6f6e75884d478597a8bdbc6396b, type: 3}
     simulationPrefab: {fileID: 0}

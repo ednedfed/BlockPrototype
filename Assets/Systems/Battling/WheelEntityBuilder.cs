@@ -4,14 +4,16 @@ using Unity.Transforms;
 
 //this is likely to represent one machine
 [DisableAutoCreation]
-public partial class WheelEntityBuilder : SystemBase, IBlockFactoryListener
+public partial class WheelEntityBuilder : SystemBase, IBlockFactoryListenerWithCategory
 {
     Dictionary<int, Entity> _wheelEntities = new Dictionary<int, Entity>();
+
+    public BlockCategory blockCategory => BlockCategory.Wheel;
 
     public void OnAdd(PlacedBlockData blockData)
     {
         //todo: make a builder per type
-        if (blockData.blockType != 2)
+        if (blockData.blockCategory != BlockCategory.Wheel)
             throw new System.Exception("built wrong block");
             
         UnityEngine.Debug.Log("built wheel");

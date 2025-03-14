@@ -5,8 +5,14 @@ public struct PlacedBlockData
 {
     public int id;
     public uint blockType;
+    public BlockCategory blockCategory;
     public Vector3 position;
     public Quaternion rotation;
+}
+
+public interface IBlockFactoryListenerWithCategory : IBlockFactoryListener
+{
+    BlockCategory blockCategory { get; }
 }
 
 public interface IBlockFactoryListener
@@ -19,7 +25,7 @@ public interface IBlockFactoryListener
 public class BlockFactory
 {
     List<IBlockFactoryListener> _listeners;
-    List<IBlockFactoryListener>[] _listenersPerType;
+    List<IBlockFactoryListener>[] _listenersPerCategory;
 
     readonly BlockTypes _blockTypes;
 
@@ -30,11 +36,11 @@ public class BlockFactory
         _blockTypes = blockTypes;
 
         _listeners = new List<IBlockFactoryListener>();
-        _listenersPerType = new List<IBlockFactoryListener>[_blockTypes.blockDatas.Length];
+        _listenersPerCategory = new List<IBlockFactoryListener>[_blockTypes.blockDatas.Length];
 
-        for (int i = 0; i < _listenersPerType.Length; ++i)
+        for (int i = 0; i < _listenersPerCategory.Length; ++i)
         { 
-            _listenersPerType[i] = new List<IBlockFactoryListener>();
+            _listenersPerCategory[i] = new List<IBlockFactoryListener>();
         }
     }
     public void RegisterBlockListener(IBlockFactoryListener listener)
@@ -42,9 +48,9 @@ public class BlockFactory
         _listeners.Add(listener);
     }
 
-    public void RegisterBlockListener(uint blockType, IBlockFactoryListener listener)
+    public void RegisterBlockListenerWithCategory(IBlockFactoryListenerWithCategory listener)
     {
-        _listenersPerType[blockType].Add(listener);
+        _listenersPerCategory[(int)listener.blockCategory].Add(listener);
     }
 
     public void InstantiateBlock(uint blockType, Vector3 position, Quaternion rotation)
@@ -53,11 +59,14 @@ public class BlockFactory
         if (blockType >= _blockTypes.blockDatas.Length || _blockTypes.blockDatas[blockType].buildPrefab == null)
             return;
 
+        var blockCategory = _blockTypes.blockDatas[blockType].blockCategory;
+
         var blockId = _idGen++;
 
         var blockData = new PlacedBlockData
         {
             id = blockId,
+            blockCategory = blockCategory,
             blockType = blockType,
             position = position,
             rotation = rotation
@@ -68,7 +77,7 @@ public class BlockFactory
             listener.OnAdd(blockData);
         }
 
-        foreach (var listener in _listenersPerType[blockType])
+        foreach (var listener in _listenersPerCategory[(int)blockCategory])
         {
             listener.OnAdd(blockData);
         }
@@ -82,7 +91,7 @@ public class BlockFactory
         }
 
         //todo: don't know types
-        foreach (var listeners in _listenersPerType)
+        foreach (var listeners in _listenersPerCategory)
         {
             foreach (var listener in listeners)
             {
@@ -101,7 +110,7 @@ public class BlockFactory
         }
 
         //all types
-        foreach (var listeners in _listenersPerType)
+        foreach (var listeners in _listenersPerCategory)
         {
             foreach (var listener in listeners)
             {

@@ -20,6 +20,11 @@ public class PlacedBlockContainer : IBlockFactoryListener
         return _placedCubes[blockId].blockType;
     }
 
+    public BlockCategory GetBlockCategory(int blockId)
+    {
+        return _placedCubes[blockId].blockCategory;
+    }
+
     public void OnClear()
     {
         _placedCubes.Clear();
