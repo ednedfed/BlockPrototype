@@ -60,4 +60,9 @@ public abstract class BlockGameConstants
         const string FileName = "/save.bin";
         public readonly static string SaveLocation = Application.persistentDataPath + FileName;
     }
+
+    public static class WeaponAim
+    {
+        public const float RaycastDistance = 10000f;
+    }
 }

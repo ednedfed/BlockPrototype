@@ -4,51 +4,49 @@ using Unity.Transforms;
 
 //this is likely to represent one machine
 [DisableAutoCreation]
-public partial class WheelEntityBuilder : SystemBase, IBlockFactoryListenerWithCategory
+public partial class LaserEntityBuilder : SystemBase, IBlockFactoryListenerWithCategory
 {
-    Dictionary<int, Entity> _wheelEntities = new Dictionary<int, Entity>();
+    Dictionary<int, Entity> _laserEntities = new Dictionary<int, Entity>();
 
-    public BlockCategory blockCategory => BlockCategory.Wheel;
+    public BlockCategory blockCategory => BlockCategory.Laser;
 
     public void OnAdd(PlacedBlockData blockData)
     {
         if (blockData.blockCategory != blockCategory)
             throw new System.Exception("built wrong block");
-
+            
         UnityEngine.Debug.Log($"built {blockCategory}");
 
         var newEntity = EntityManager.CreateEntity();
 
         //todo: machine id component?
         EntityManager.AddComponentData(newEntity, new BlockIdComponent() { blockId = blockData.id });
-        EntityManager.AddComponentData(newEntity, new WheelComponent()
+        EntityManager.AddComponentData(newEntity, new LaserComponent()
         {
-            maxSteerAngle = 30f,
-            radius = 0.75f
         });
         EntityManager.AddComponentData(newEntity, new LocalTransform() { Position = blockData.position, Rotation = blockData.rotation, Scale = 1f });
 
-        _wheelEntities.Add(blockData.id, newEntity);
+        _laserEntities.Add(blockData.id, newEntity);
     }
 
     public void OnRemove(int blockId)
     {
-        if (_wheelEntities.ContainsKey(blockId))
+        if (_laserEntities.ContainsKey(blockId))
         {
-            EntityManager.DestroyEntity(_wheelEntities[blockId]);
+            EntityManager.DestroyEntity(_laserEntities[blockId]);
 
-            _wheelEntities.Remove(blockId);
+            _laserEntities.Remove(blockId);
         }
     }
 
     public void OnClear()
     {
-        foreach (var entity in _wheelEntities.Values)
+        foreach (var entity in _laserEntities.Values)
         {
             EntityManager.DestroyEntity(entity);
         }
 
-        _wheelEntities.Clear();
+        _laserEntities.Clear();
     }
 
     protected override void OnUpdate() { }

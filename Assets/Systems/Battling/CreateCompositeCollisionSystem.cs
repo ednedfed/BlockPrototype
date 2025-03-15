@@ -95,7 +95,8 @@ partial class CreateCompositeCollisionSystem : SystemBase
 
         EntityManager.AddSharedComponent(entity, new MachineTagComponent());
 
-        //todo: per block?
+        //todo: per block? per machine? decide
         EntityManager.AddComponentData(entity, new PlayerInputComponent());
+        EntityManager.AddComponentData(entity, new CameraRaycastComponent());
     }
 }

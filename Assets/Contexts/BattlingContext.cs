@@ -1,5 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class BattlingContext : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class BattlingContext : MonoBehaviour
         blockFactory.RegisterBlockListener(blockGameObjectContainer);
 
         RegisterBlockEntityBuilder<WheelEntityBuilder>(world, simulationGroup, blockFactory);
+        RegisterBlockEntityBuilder<LaserEntityBuilder>(world, simulationGroup, blockFactory);
 
         AddToWorldAndGroupSystemManaged(new PlaceBlockSystem(blockFactory), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new LoadAtStartSystem(blockFactory), world, simulationGroup);
@@ -37,6 +39,8 @@ public class BattlingContext : MonoBehaviour
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
         AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer, rigidbodyEntityFactory), world, fixedStepSimulationGroup);
+
+        AddToWorldAndGroupSystemManaged(new WeaponAimRaycastSystem(Camera.main.transform), world, fixedStepSimulationGroup);
 
         AddToWorldAndGroupSystemManaged(new MachineControllerSystem(), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new WheelsApplyForcesSystem(), world, fixedStepSimulationGroup);

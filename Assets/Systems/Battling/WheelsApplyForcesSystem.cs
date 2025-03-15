@@ -25,10 +25,11 @@ partial class WheelsApplyForcesSystem : SystemBase
                     //forward back
                     velocity.z += playerInput.moveVector.y * deltaTime * 10f;
 
+                    //un-steering when input not pressed
                     if (math.abs(playerInput.moveVector.x) < 0.001f)
                         wheelComponent.ValueRW.currentSteerAngle *= 0.7f;
 
-                    //left right
+                    //left right, todo: work out how to move to on add
                     bool isInfront = wheelTransform.Position.z >= machinePhysicsMass.CenterOfMass.z;
 
                     if(isInfront)
@@ -37,8 +38,6 @@ partial class WheelsApplyForcesSystem : SystemBase
                         wheelComponent.ValueRW.currentSteerAngle -= playerInput.moveVector.x * deltaTime * 200f;
 
                     wheelComponent.ValueRW.currentSteerAngle = math.clamp(wheelComponent.ValueRW.currentSteerAngle, -wheelComponent.ValueRW.maxSteerAngle, wheelComponent.ValueRW.maxSteerAngle);
-
-                    UnityEngine.Debug.Log(wheelComponent.ValueRW.currentSteerAngle);
 
                     var wheelWorldRotation = math.mul(machineTransform.Rotation, wheelTransform.Rotation);
                     var wheelWorldPosition = math.mul(machineTransform.Rotation, wheelTransform.Position) + machineTransform.Position;
