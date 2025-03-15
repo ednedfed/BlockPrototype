@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
@@ -13,6 +14,7 @@ public class BattlingContext : MonoBehaviour
         //todo: totally custom world to exclude unnecessary sytems?
         var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
         var simulationGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+        var transformGroup = world.GetOrCreateSystemManaged<TransformSystemGroup>();
 
         var blockTypes = Resources.Load<BlockTypes>("ScriptableObjects/BlockTypes");
 
@@ -24,14 +26,18 @@ public class BattlingContext : MonoBehaviour
         blockFactory.RegisterBlockListener(placedBlockContainer);
         blockFactory.RegisterBlockListener(blockGameObjectContainer);
 
+        //every block must have this from now on
+        RegisterBlockEntityBuilder<BlockEntityBuilder>(world, simulationGroup, blockFactory);
         RegisterBlockEntityBuilder<WheelEntityBuilder>(world, simulationGroup, blockFactory);
         RegisterBlockEntityBuilder<LaserEntityBuilder>(world, simulationGroup, blockFactory);
 
         AddToWorldAndGroupSystemManaged(new PlaceBlockSystem(blockFactory), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new LoadAtStartSystem(blockFactory), world, simulationGroup);
-        AddToWorldAndGroupSystemManaged(new ParentCameraToMachineSystem(Camera.main.transform.parent), world, simulationGroup);
-        AddToWorldAndGroupSystemManaged(new ParentGameObjectToMachineSystem(blockGameObjectContainer, placedBlockContainer), world, simulationGroup);
         
+        AddToWorldAndGroupSystemManaged(new ParentGameObjectToMachineSystem(blockGameObjectContainer), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new ParentCameraToMachineSystem(Camera.main.transform.parent), world, simulationGroup);
+
+        AddToWorldAndGroupSystemManaged(new WeaponAimRaycastSystem(Camera.main.transform), world, simulationGroup);
 
         //camera has no parent yet in this context
         AddToWorldAndGroupSystemManaged(new MouseLookRotationSystem(Camera.main.transform), world, simulationGroup);
@@ -40,7 +46,7 @@ public class BattlingContext : MonoBehaviour
 
         AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer, rigidbodyEntityFactory), world, fixedStepSimulationGroup);
 
-        AddToWorldAndGroupSystemManaged(new WeaponAimRaycastSystem(Camera.main.transform), world, fixedStepSimulationGroup);
+        
 
         AddToWorldAndGroupSystemManaged(new MachineControllerSystem(), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new WheelsApplyForcesSystem(), world, fixedStepSimulationGroup);

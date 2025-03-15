@@ -1,34 +1,39 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEditor.Rendering;
-using UnityEngine.UIElements;
 
+//do this after parent group or it can be out of sync, e.g frame behind?
 [DisableAutoCreation]
+[UpdateAfter(typeof(TransformSystemGroup))]
 partial class ParentGameObjectToMachineSystem : SystemBase
 {
     BlockGameObjectContainer _blockGameObjectContainer;
-    PlacedBlockContainer _placedBlockContainer;
 
-    public ParentGameObjectToMachineSystem(BlockGameObjectContainer blockGameObjectContainer, PlacedBlockContainer placedBlockContainer)
+    public ParentGameObjectToMachineSystem(BlockGameObjectContainer blockGameObjectContainer)
     {
         _blockGameObjectContainer = blockGameObjectContainer;
-        _placedBlockContainer = placedBlockContainer;
     }
+
+    DebugDraw.PosTracker _posTracker = new DebugDraw.PosTracker();
 
     protected override void OnUpdate()
     {
         foreach (var (machineTag, machineLocalTransform) in SystemAPI.Query<MachineTagComponent, LocalTransform>())
         {
-            var allBlocks = _placedBlockContainer.GetValues();
-            foreach (var block in allBlocks)
-            {
-                //todo: parent block entities, then sync gameobject later on
+            bool debug = false;
 
-                //todo: use instancing or dots rendering and this becomes redundant
-                var instance = _blockGameObjectContainer.GetGameObject(block.id);
-                instance.transform.position = math.mul(machineLocalTransform.Rotation, block.position) + machineLocalTransform.Position;
-                instance.transform.rotation = math.mul(machineLocalTransform.Rotation, block.rotation);
+            //add a child offset, currently wheels, but might become generic
+            foreach (var (blockWorld, blockIdComponent) in SystemAPI.Query<LocalToWorld, BlockIdComponent>())
+            {
+                var blockGameObject = _blockGameObjectContainer.GetGameObject(blockIdComponent.blockId);
+                blockGameObject.transform.position = blockWorld.Position;
+                blockGameObject.transform.rotation = blockWorld.Rotation;
+
+                if (debug == false)
+                {
+                    _posTracker.Update(blockGameObject.transform.position, SystemAPI.Time.DeltaTime, UnityEngine.Color.white);
+                    debug = true;
+                }
             }
 
             //add a child offset, currently wheels, but might become generic

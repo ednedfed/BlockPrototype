@@ -1,17 +1,23 @@
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
+using UnityEditor;
 using UnityEngine;
 
 [DisableAutoCreation]
-partial class CreateCompositeCollisionSystem : SystemBase
+partial class CreateCompositeCollisionSystem : SystemBase, IDisposable
 {
     BlockGameObjectContainer _blockGameObjectContainer;
     PlacedBlockContainer _placedBlockContainer;
     RigidbodyEntityFactory _rigidbodyEntityFactory;
-
+    
     bool _created;
+
+    //these are allocated so must clean after
+    List<BlobAssetReference<Unity.Physics.Collider>> _collidersToDestroy = new List<BlobAssetReference<Unity.Physics.Collider>>();
 
     public CreateCompositeCollisionSystem(BlockGameObjectContainer blockGameObjectContainer, PlacedBlockContainer placedBlockContainer, RigidbodyEntityFactory rigidbodyEntityFactory)
     {
@@ -24,6 +30,7 @@ partial class CreateCompositeCollisionSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        //todo: eventually use pure entities
         var blocks = _placedBlockContainer.GetValues();
         if (_created == false && blocks.Count > 0)
         {
@@ -41,6 +48,7 @@ partial class CreateCompositeCollisionSystem : SystemBase
 
         foreach (var block in blocks)
         {
+            //todo: remove gameobject
             var gameObject = _blockGameObjectContainer.GetGameObject(block.id);
             var collider = gameObject.GetComponentInChildren<UnityEngine.Collider>();
             BlobAssetReference<Unity.Physics.Collider> boxColliderEcs = default;
@@ -82,6 +90,9 @@ partial class CreateCompositeCollisionSystem : SystemBase
 
         var compoundCollider = Unity.Physics.CompoundCollider.Create(children.AsArray());
 
+        //todo: when do we deal with this, which unity identifies as a leak?
+        _collidersToDestroy.Add(compoundCollider);
+
         foreach (var child in children)
         {
             child.Collider.Dispose();
@@ -91,12 +102,17 @@ partial class CreateCompositeCollisionSystem : SystemBase
 
         centreOfMass /= blocks.Count;
 
-        Entity entity = _rigidbodyEntityFactory.CreateRigidbodyEntity(EntityManager, compoundCollider, centreOfMass, "MachineRigidbody");
-
-        EntityManager.AddSharedComponent(entity, new MachineTagComponent());
+        Entity machineEntity = _rigidbodyEntityFactory.CreateRigidbodyEntity(EntityManager, compoundCollider, centreOfMass, "MachineRigidbody");
 
         //todo: per block? per machine? decide
-        EntityManager.AddComponentData(entity, new PlayerInputComponent());
-        EntityManager.AddComponentData(entity, new CameraRaycastComponent());
+        EntityManager.AddSharedComponent(machineEntity, new MachineTagComponent());
+        EntityManager.AddComponentData(machineEntity, new PlayerInputComponent());
+        EntityManager.AddComponentData(machineEntity, new CameraRaycastComponent());
+
+        //try to get dots to do the parenting
+        foreach (var (blockId, localTransform, parent) in SystemAPI.Query<BlockIdComponent, RefRW<LocalTransform>, RefRW<Parent>>())
+        {
+            parent.ValueRW.Value = machineEntity;
+        }
     }
 }

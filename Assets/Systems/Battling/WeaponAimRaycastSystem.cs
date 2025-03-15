@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -24,11 +25,8 @@ partial class WeaponAimRaycastSystem : SystemBase
 
             cameraRaycast.ValueRW.hitInfo = hitInfo;
 
-
-
             UnityEngine.Debug.DrawLine(_cameraTransform.position, _cameraTransform.position + _cameraTransform.transform.forward * BlockGameConstants.WeaponAim.RaycastDistance, UnityEngine.Color.yellow, SystemAPI.Time.DeltaTime);
             UnityEngine.Debug.DrawLine(_cameraTransform.position, hitInfo.point, UnityEngine.Color.white, SystemAPI.Time.DeltaTime);
-
 
             foreach (var laser in SystemAPI.Query<RefRW<LaserComponent>>())
             {
