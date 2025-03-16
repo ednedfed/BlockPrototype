@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
 
 [DisableAutoCreation]
-partial class CreateCompositeCollisionSystem : SystemBase, IDisposable
+partial class CreateCompositeCollisionSystem : SystemBase
 {
     BlockGameObjectContainer _blockGameObjectContainer;
     PlacedBlockContainer _placedBlockContainer;
@@ -17,7 +18,7 @@ partial class CreateCompositeCollisionSystem : SystemBase, IDisposable
     bool _created;
 
     //these are allocated so must clean after
-    List<BlobAssetReference<Unity.Physics.Collider>> _collidersToDestroy = new List<BlobAssetReference<Unity.Physics.Collider>>();
+    List<Entity> _entitisBuilt = new List<Entity>();
 
     public CreateCompositeCollisionSystem(BlockGameObjectContainer blockGameObjectContainer, PlacedBlockContainer placedBlockContainer, RigidbodyEntityFactory rigidbodyEntityFactory)
     {
@@ -25,8 +26,34 @@ partial class CreateCompositeCollisionSystem : SystemBase, IDisposable
         _placedBlockContainer = placedBlockContainer;
         _rigidbodyEntityFactory = rigidbodyEntityFactory;
 
+        //todo: support multiple instances
         _created = false;
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+#endif
     }
+
+#if UNITY_EDITOR
+    private void OnPlayModeStateChanged(PlayModeStateChange change)
+    {
+        if (change == PlayModeStateChange.ExitingPlayMode)
+        {
+            for (int i = 0; i < _entitisBuilt.Count; ++i)
+            {
+                Entity entity = _entitisBuilt[i];
+
+                var collider = EntityManager.GetComponentData<PhysicsCollider>(entity);
+
+                collider.Value.Dispose();
+
+                EntityManager.DestroyEntity(entity);
+            }
+
+            _entitisBuilt.Clear();
+        }
+    }
+#endif
 
     protected override void OnUpdate()
     {
@@ -90,9 +117,6 @@ partial class CreateCompositeCollisionSystem : SystemBase, IDisposable
 
         var compoundCollider = Unity.Physics.CompoundCollider.Create(children.AsArray());
 
-        //todo: when do we deal with this, which unity identifies as a leak?
-        _collidersToDestroy.Add(compoundCollider);
-
         foreach (var child in children)
         {
             child.Collider.Dispose();
@@ -103,6 +127,10 @@ partial class CreateCompositeCollisionSystem : SystemBase, IDisposable
         centreOfMass /= blocks.Count;
 
         Entity machineEntity = _rigidbodyEntityFactory.CreateRigidbodyEntity(EntityManager, compoundCollider, centreOfMass, "MachineRigidbody");
+
+
+        //todo: when do we deal with this, which unity identifies as a leak?
+        _entitisBuilt.Add(machineEntity);
 
         //todo: per block? per machine? decide
         EntityManager.AddSharedComponent(machineEntity, new MachineTagComponent());
