@@ -1,7 +1,6 @@
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public class BattlingContext : MonoBehaviour
 {
@@ -11,6 +10,8 @@ public class BattlingContext : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
+        SpawnPointComponent[] spawnPoints = Object.FindObjectsByType<SpawnPointComponent>(FindObjectsSortMode.None);
+
         //todo: totally custom world to exclude unnecessary sytems?
         var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
         var simulationGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
@@ -44,9 +45,7 @@ public class BattlingContext : MonoBehaviour
 
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
-        AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer, rigidbodyEntityFactory), world, fixedStepSimulationGroup);
-
-        
+        AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer, rigidbodyEntityFactory, spawnPoints), world, fixedStepSimulationGroup);        
 
         AddToWorldAndGroupSystemManaged(new MachineControllerSystem(), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new WheelsApplyForcesSystem(), world, fixedStepSimulationGroup);

@@ -8,15 +8,16 @@ using UnityEngine;
 public class RigidbodyEntityFactory
 {
     //ensure all components are added that are needed
-    public Entity CreateRigidbodyEntity(EntityManager entityManager, BlobAssetReference<Unity.Physics.Collider> collider, Vector3 centreOfMass, FixedString64Bytes entityName)
+    public Entity CreateRigidbodyEntity(EntityManager entityManager, BlobAssetReference<Unity.Physics.Collider> collider, Vector3 centreOfMass, FixedString64Bytes entityName,
+        float3 position, quaternion rotation)
     {
         // Create a new entity with the combined collider
         Entity rigidbodyEntity = entityManager.CreateEntity();
         entityManager.SetName(rigidbodyEntity, entityName);
 
         entityManager.AddComponentData(rigidbodyEntity, new PhysicsCollider { Value = collider });
-        entityManager.AddComponentData(rigidbodyEntity, new LocalTransform { Position = float3.zero, Rotation = quaternion.identity, Scale = 1f });
-        entityManager.AddComponentData(rigidbodyEntity, new LocalToWorld() );
+        entityManager.AddComponentData(rigidbodyEntity, new LocalTransform { Position = position, Rotation = rotation, Scale = 1f });
+        entityManager.AddComponentData(rigidbodyEntity, new LocalToWorld());
 
         // 3. PhysicsMass - Defines mass and inertia (automatic calculation for dynamic bodies)
         var physicsMass = PhysicsMass.CreateDynamic(MassProperties.CreateBox(collider.Value.CalculateAabb().Extents), 1f);

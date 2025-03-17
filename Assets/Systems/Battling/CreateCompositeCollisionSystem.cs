@@ -13,19 +13,23 @@ partial class CreateCompositeCollisionSystem : SystemBase
     BlockGameObjectContainer _blockGameObjectContainer;
     PlacedBlockContainer _placedBlockContainer;
     RigidbodyEntityFactory _rigidbodyEntityFactory;
-    
+    SpawnPointComponent[] _spawnPoints;
+
+
     bool _created;
 
     //these are allocated so must clean after
     List<Entity> _entitisBuilt = new List<Entity>();
 
-    public CreateCompositeCollisionSystem(BlockGameObjectContainer blockGameObjectContainer, PlacedBlockContainer placedBlockContainer, RigidbodyEntityFactory rigidbodyEntityFactory)
+    public CreateCompositeCollisionSystem(BlockGameObjectContainer blockGameObjectContainer, PlacedBlockContainer placedBlockContainer,
+        RigidbodyEntityFactory rigidbodyEntityFactory, SpawnPointComponent[] spawnPoints)
     {
         _blockGameObjectContainer = blockGameObjectContainer;
         _placedBlockContainer = placedBlockContainer;
         _rigidbodyEntityFactory = rigidbodyEntityFactory;
 
-        //todo: support multiple instances
+        _spawnPoints = spawnPoints;
+
         _created = false;
 
 #if UNITY_EDITOR
@@ -130,8 +134,10 @@ partial class CreateCompositeCollisionSystem : SystemBase
         filter.GroupIndex = -machineId;
         compoundCollider.Value.SetCollisionFilter(filter);
 
-        Entity machineEntity = _rigidbodyEntityFactory.CreateRigidbodyEntity(EntityManager, compoundCollider, centreOfMass, "MachineRigidbody");
+        Entity machineEntity = _rigidbodyEntityFactory.CreateRigidbodyEntity(EntityManager, compoundCollider, centreOfMass, "MachineRigidbody",
+            _spawnPoints[0].transform.position, _spawnPoints[0].transform.rotation);
 
+        
 
         //todo: when do we deal with this, which unity identifies as a leak?
         _entitisBuilt.Add(machineEntity);
