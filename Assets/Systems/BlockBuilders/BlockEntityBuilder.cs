@@ -20,10 +20,11 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
        //UnityEngine.Debug.Log($"built {blockCategory}");
 
         var newEntity = EntityManager.CreateEntity();
-        EntityManager.SetName(newEntity, $"Block_{blockCategory}_{blockData.id}");
+        EntityManager.SetName(newEntity, $"Block_{blockCategory}_{blockData.blockId}");
 
-        //todo: machine id component?
-        EntityManager.AddComponentData(newEntity, new BlockIdComponent() { blockId = blockData.id });
+        EntityManager.AddComponentData(newEntity, new BlockIdComponent() { blockId = blockData.blockId });
+        EntityManager.AddComponentData(newEntity, new MachineIdComponent() { machineId = blockData.machineId });
+
         EntityManager.AddComponentData(newEntity, new LocalTransform() { Position = blockData.position, Rotation = blockData.rotation, Scale = 1f });
 
         //set up for parenting
@@ -32,7 +33,7 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
 
         OnBuild(newEntity, blockData);
 
-        _builtEntities.Add(blockData.id, newEntity);
+        _builtEntities.Add(blockData.blockId, newEntity);
     }
 
     public void OnRemove(int blockId)
@@ -45,6 +46,13 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
         }
     }
 
+    public void OnClear(int machineId)
+    {
+        //todo: filter per machine
+    }
+
+    protected override void OnUpdate() { }
+
     public void OnClear()
     {
         foreach (var entity in _builtEntities.Values)
@@ -54,6 +62,4 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
 
         _builtEntities.Clear();
     }
-
-    protected override void OnUpdate() { }
 }

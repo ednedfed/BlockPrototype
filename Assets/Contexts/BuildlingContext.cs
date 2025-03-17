@@ -12,7 +12,7 @@ public class BuildlingContext : MonoBehaviour
         var blockTypes = Resources.Load<BlockTypes>("ScriptableObjects/BlockTypes");
 
         PlacedBlockContainer placedBlockContainer = new PlacedBlockContainer();
-        BlockGameObjectContainer blockGameObjectContainer = new BlockGameObjectContainer(blockTypes);
+        BlockGameObjectContainer blockGameObjectContainer = new BlockGameObjectContainer(blockTypes, true);
 
         BlockFactory blockFactory = new BlockFactory(blockTypes);
         blockFactory.RegisterBlockListener(placedBlockContainer);

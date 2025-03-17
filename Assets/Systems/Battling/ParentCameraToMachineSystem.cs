@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -22,6 +21,10 @@ partial class ParentCameraToMachineSystem : SystemBase
     {
         foreach (var (machineTag, localTransform, physicsMass) in SystemAPI.Query<MachineTagComponent, LocalToWorld, PhysicsMass>())
         {
+            //for now only control one machine
+            if (machineTag.machineId != 0)
+                continue;
+
             //is there a way to use camera in dots?
             var worldSpaceCom = localTransform.Position + math.mul(localTransform.Rotation, physicsMass.CenterOfMass);
 

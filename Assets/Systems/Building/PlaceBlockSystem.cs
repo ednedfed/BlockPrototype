@@ -1,6 +1,5 @@
 using Unity.Entities;
 using Unity.Transforms;
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 [DisableAutoCreation]
@@ -24,7 +23,7 @@ partial class PlaceBlockSystem : SystemBase
             {
                 foreach (var (ghostBlockData, localTranforms) in SystemAPI.Query<GhostBlockDataComponent, LocalTransform>())
                 {
-                    _blockFactory.InstantiateBlock(ghostBlockData.blockType, localTranforms.Position, localTranforms.Rotation);
+                    _blockFactory.AddBlock(ghostBlockData.blockType, localTranforms.Position, localTranforms.Rotation, BlockGameConstants.SaveGame.BuildMachineId);
                 }
             }
         }

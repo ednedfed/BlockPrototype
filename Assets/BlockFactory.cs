@@ -3,11 +3,22 @@ using UnityEngine;
 
 public struct PlacedBlockData
 {
-    public int id;
-    public uint blockType;
-    public BlockCategory blockCategory;
-    public Vector3 position;
-    public Quaternion rotation;
+    public readonly int machineId;
+    public readonly int blockId;
+    public readonly uint blockType;
+    public readonly BlockCategory blockCategory;
+    public readonly Vector3 position;
+    public readonly Quaternion rotation;
+
+    public PlacedBlockData(int machineId, int blockId, uint blockType, BlockCategory blockCategory, Vector3 position, Quaternion rotation)
+    {
+        this.machineId = machineId;
+        this.blockId = blockId;
+        this.blockType = blockType;
+        this.blockCategory = blockCategory;
+        this.position = position;
+        this.rotation = rotation;
+    }
 }
 
 public interface IBlockFactoryListenerWithCategory : IBlockFactoryListener
@@ -19,7 +30,8 @@ public interface IBlockFactoryListener
 {
     void OnAdd(PlacedBlockData blockData);
     void OnRemove(int blockId);
-    void OnClear();
+    void OnClear(int machineId);//clear slot only
+    void OnClear();//clear everything
 }
 
 public class BlockFactory
@@ -53,7 +65,7 @@ public class BlockFactory
         _listenersPerCategory[(int)listener.blockCategory].Add(listener);
     }
 
-    public void InstantiateBlock(uint blockType, Vector3 position, Quaternion rotation)
+    public void AddBlock(uint blockType, Vector3 position, Quaternion rotation, int machineId)
     {
         //todo: replace prefabs with pure data
         if (blockType >= _blockTypes.blockDatas.Length || _blockTypes.blockDatas[blockType].buildPrefab == null)
@@ -63,14 +75,14 @@ public class BlockFactory
 
         var blockId = _idGen++;
 
-        var blockData = new PlacedBlockData
-        {
-            id = blockId,
-            blockCategory = blockCategory,
-            blockType = blockType,
-            position = position,
-            rotation = rotation
-        };
+        var blockData = new PlacedBlockData(
+            machineId,
+            blockId,
+            blockType,
+            blockCategory,
+            position,
+            rotation
+        );
 
         foreach (var listener in _listeners)
         {
@@ -96,6 +108,24 @@ public class BlockFactory
             foreach (var listener in listeners)
             {
                 listener.OnRemove(blockId);
+            }
+        }
+    }
+
+    //do not reset idgen when it's per machine
+    public void Clear(int machineId)
+    {
+        foreach (var listener in _listeners)
+        {
+            listener.OnClear(machineId);
+        }
+
+        //all types
+        foreach (var listeners in _listenersPerCategory)
+        {
+            foreach (var listener in listeners)
+            {
+                listener.OnClear(machineId);
             }
         }
     }

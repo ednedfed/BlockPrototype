@@ -20,10 +20,12 @@ partial class MachineControllerSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        float deltaTime = SystemAPI.Time.DeltaTime;
-
-        foreach (var playerInput in SystemAPI.Query<RefRW<PlayerInputComponent>>())
+        foreach (var (playerInput, machineTag) in SystemAPI.Query<RefRW<PlayerInputComponent>, MachineTagComponent>())
         {
+            //for now only control one machine
+            if (machineTag.machineId != 0)
+                continue;
+
             playerInput.ValueRW.moveVector = _moveAction.ReadValue<Vector2>();
         }
     }

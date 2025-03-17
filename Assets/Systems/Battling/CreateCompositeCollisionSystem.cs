@@ -15,11 +15,8 @@ partial class CreateCompositeCollisionSystem : SystemBase
     RigidbodyEntityFactory _rigidbodyEntityFactory;
     SpawnPointComponent[] _spawnPoints;
 
-
-    bool _created;
-
     //these are allocated so must clean after
-    List<Entity> _entitisBuilt = new List<Entity>();
+    List<Entity> _entitiesBuilt = new List<Entity>();
 
     public CreateCompositeCollisionSystem(BlockGameObjectContainer blockGameObjectContainer, PlacedBlockContainer placedBlockContainer,
         RigidbodyEntityFactory rigidbodyEntityFactory, SpawnPointComponent[] spawnPoints)
@@ -29,8 +26,6 @@ partial class CreateCompositeCollisionSystem : SystemBase
         _rigidbodyEntityFactory = rigidbodyEntityFactory;
 
         _spawnPoints = spawnPoints;
-
-        _created = false;
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
@@ -43,9 +38,9 @@ partial class CreateCompositeCollisionSystem : SystemBase
     {
         if (change == PlayModeStateChange.ExitingPlayMode)
         {
-            for (int i = 0; i < _entitisBuilt.Count; ++i)
+            for (int i = 0; i < _entitiesBuilt.Count; ++i)
             {
-                Entity entity = _entitisBuilt[i];
+                Entity entity = _entitiesBuilt[i];
 
                 var collider = EntityManager.GetComponentData<PhysicsCollider>(entity);
 
@@ -54,34 +49,47 @@ partial class CreateCompositeCollisionSystem : SystemBase
                 EntityManager.DestroyEntity(entity);
             }
 
-            _entitisBuilt.Clear();
+            _entitiesBuilt.Clear();
         }
     }
 #endif
 
     protected override void OnUpdate()
     {
-        //todo: eventually use pure entities but for now it's ok to use collider from game objects
-        var blocks = _placedBlockContainer.GetValues();
-        if (_created == false && blocks.Count > 0)
+        for (int i = 0; i < _spawnPoints.Length; ++i)
         {
-            CreateMachineCompositeCollider(blocks, 1);
+            var spawnPoint = _spawnPoints[i];
 
-            _created = true;
+            if(spawnPoint.isLoaded == false)
+                continue;
+
+            //todo: eventually use pure entities but for now it's ok to use collider from game objects
+            var blocks = _placedBlockContainer.GetValues(i);
+            if (blocks.Count > 0 && spawnPoint.isSpawned == false)
+            {
+                CreateMachine(blocks, i, spawnPoint.transform.position, spawnPoint.transform.rotation);
+
+                //even if we don't store it only in the spawn point we at least don't want use the spawn point for more than one player
+                spawnPoint.isSpawned = true;
+            }
         }
     }
 
-    void CreateMachineCompositeCollider(Dictionary<int, PlacedBlockData>.ValueCollection blocks, int machineId)
+    void CreateMachine(Dictionary<int, PlacedBlockData>.ValueCollection blocks, int machineIndex, float3 spawnPosition, quaternion spawnRotation)
     {
         Vector3 centreOfMass = Vector3.zero;
 
-        NativeList<Unity.Physics.CompoundCollider.ColliderBlobInstance> children = new NativeList<Unity.Physics.CompoundCollider.ColliderBlobInstance>(blocks.Count, Allocator.Temp);
+        NativeList<Unity.Physics.CompoundCollider.ColliderBlobInstance> childColliders = new NativeList<Unity.Physics.CompoundCollider.ColliderBlobInstance>(blocks.Count, Allocator.Temp);
 
         foreach (var block in blocks)
         {
             //todo: remove gameobject
-            var gameObject = _blockGameObjectContainer.GetGameObject(block.id);
-            var collider = gameObject.GetComponentInChildren<UnityEngine.Collider>();
+            var blockGameObject = _blockGameObjectContainer.GetGameObject(block.blockId);
+
+            //set active when ready
+            blockGameObject.SetActive(true);
+
+            var collider = blockGameObject.GetComponentInChildren<UnityEngine.Collider>();
             BlobAssetReference<Unity.Physics.Collider> boxColliderEcs = default;
 
             //todo: once blocks are entities, use correct collider type
@@ -108,49 +116,54 @@ partial class CreateCompositeCollisionSystem : SystemBase
                 });
             }
 
-            children.Add(
+            childColliders.Add(
                 new Unity.Physics.CompoundCollider.ColliderBlobInstance
                 {
                     Collider = boxColliderEcs,
-                    CompoundFromChild = new Unity.Mathematics.RigidTransform(gameObject.transform.rotation, gameObject.transform.position),
+                    CompoundFromChild = new Unity.Mathematics.RigidTransform(blockGameObject.transform.rotation, blockGameObject.transform.position),
                 }
             );
 
-            centreOfMass += gameObject.transform.position;
+            centreOfMass += blockGameObject.transform.position;
         }
 
-        var compoundCollider = Unity.Physics.CompoundCollider.Create(children.AsArray());
+        var compoundCollider = Unity.Physics.CompoundCollider.Create(childColliders.AsArray());
 
-        foreach (var child in children)
+        foreach (var child in childColliders)
         {
             child.Collider.Dispose();
         }
 
-        children.Dispose();
+        childColliders.Dispose();
 
         centreOfMass /= blocks.Count;
 
+        var collisionGroup = -(machineIndex + 1);
+
         var filter = compoundCollider.Value.GetCollisionFilter();
-        filter.GroupIndex = -machineId;
+        filter.GroupIndex = collisionGroup;
         compoundCollider.Value.SetCollisionFilter(filter);
 
-        Entity machineEntity = _rigidbodyEntityFactory.CreateRigidbodyEntity(EntityManager, compoundCollider, centreOfMass, "MachineRigidbody",
-            _spawnPoints[0].transform.position, _spawnPoints[0].transform.rotation);
+        Entity machineEntity = _rigidbodyEntityFactory.CreateRigidbodyEntity(
+            EntityManager, compoundCollider, centreOfMass, $"MachineRigidbody_{machineIndex}",
+            spawnPosition, spawnRotation);
 
         
 
         //todo: when do we deal with this, which unity identifies as a leak?
-        _entitisBuilt.Add(machineEntity);
+        _entitiesBuilt.Add(machineEntity);
 
-        //todo: per block? per machine? decide
-        EntityManager.AddSharedComponent(machineEntity, new MachineTagComponent() { collisionGroupIndex = machineId });
+        EntityManager.AddSharedComponent(machineEntity, new MachineTagComponent() { collisionGroupIndex = collisionGroup, machineId = machineIndex });
         EntityManager.AddComponentData(machineEntity, new PlayerInputComponent());
         EntityManager.AddComponentData(machineEntity, new CameraRaycastComponent());
 
-        //try to get dots to do the parenting
-        foreach (var (blockId, localTransform, parent) in SystemAPI.Query<BlockIdComponent, RefRW<LocalTransform>, RefRW<Parent>>())
+        //todo: use shared component
+        foreach (var (blockId, machineId, localTransform, parent) in SystemAPI.Query<BlockIdComponent, MachineIdComponent, RefRW<LocalTransform>, RefRW<Parent>>())
         {
-            parent.ValueRW.Value = machineEntity;
+            if (machineId.machineId == machineIndex)
+            {
+                parent.ValueRW.Value = machineEntity;
+            }
         }
     }
 }

@@ -4,21 +4,24 @@ using Unity.Entities;
 partial class LoadAtStartSystem : SystemBase
 {
     BlockFactory _blockFactory;
-    bool _isLoaded;
+    SpawnPointComponent[] _spawnPoints;
 
-    public LoadAtStartSystem(BlockFactory blockFactory)
+    public LoadAtStartSystem(BlockFactory blockFactory, SpawnPointComponent[] spawnPoints)
     {
         _blockFactory = blockFactory;
-        _isLoaded = false;
+        _spawnPoints = spawnPoints;
     }
 
     protected override void OnUpdate() 
     {
-        if (_isLoaded == false)
+        for (int i = 0; i < _spawnPoints.Length; ++i)
         {
-            _isLoaded = true;
+            if (_spawnPoints[i].isLoaded == false)
+            {
+                LoadAndSaveUtility.LoadGame(_blockFactory, i);
 
-            LoadAndSaveUtility.LoadGame(_blockFactory);
+                _spawnPoints[i].isLoaded = true;
+            }
         }
     }
 }

@@ -12,56 +12,55 @@ partial class WheelsApplyForcesSystem : SystemBase
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
 
-        //todo: get wheels and apply force
-        foreach (var playerInput in SystemAPI.Query<PlayerInputComponent>())
+        foreach (var (machinePhysicsVelocity, machinePhysicsMass, machineTransform, machineTag, playerInput) in SystemAPI.Query<RefRW<PhysicsVelocity>, PhysicsMass, LocalTransform, MachineTagComponent, PlayerInputComponent>())
         {
-            foreach (var (machinePhysicsVelocity, machinePhysicsMass, machineTransform, machineTag) in SystemAPI.Query<RefRW<PhysicsVelocity>, PhysicsMass, LocalTransform, MachineTagComponent>())
+            foreach (var (wheelComponent, wheelTransform, machineIdComponent) in SystemAPI.Query<RefRW<WheelComponent>, LocalTransform, MachineIdComponent>())
             {
-                foreach (var (wheelComponent, wheelTransform) in SystemAPI.Query<RefRW<WheelComponent>, LocalTransform>())
-                {
-                    var velocity = float3.zero;
-                    var angularVelocity = float3.zero;
+                if (machineIdComponent.machineId != machineTag.machineId)
+                    continue;
 
-                    //forward back
-                    velocity.z += playerInput.moveVector.y * deltaTime * 10f;
+                var velocity = float3.zero;
+                var angularVelocity = float3.zero;
 
-                    //un-steering when input not pressed
-                    if (math.abs(playerInput.moveVector.x) < 0.001f)
-                        wheelComponent.ValueRW.currentSteerAngle *= 0.7f;
+                //forward back
+                velocity.z += playerInput.moveVector.y * deltaTime * 10f;
 
-                    //left right, todo: work out how to move to on add
-                    bool isInfront = wheelTransform.Position.z >= machinePhysicsMass.CenterOfMass.z;
+                //un-steering when input not pressed
+                if (math.abs(playerInput.moveVector.x) < 0.001f)
+                    wheelComponent.ValueRW.currentSteerAngle *= 0.7f;
 
-                    if(isInfront)
-                        wheelComponent.ValueRW.currentSteerAngle += playerInput.moveVector.x * deltaTime * 200f;
-                    else
-                        wheelComponent.ValueRW.currentSteerAngle -= playerInput.moveVector.x * deltaTime * 200f;
+                //left right, todo: work out how to move to on add
+                bool isInfront = wheelTransform.Position.z >= machinePhysicsMass.CenterOfMass.z;
 
-                    wheelComponent.ValueRW.currentSteerAngle = math.clamp(wheelComponent.ValueRW.currentSteerAngle, -wheelComponent.ValueRW.maxSteerAngle, wheelComponent.ValueRW.maxSteerAngle);
+                if(isInfront)
+                    wheelComponent.ValueRW.currentSteerAngle += playerInput.moveVector.x * deltaTime * 200f;
+                else
+                    wheelComponent.ValueRW.currentSteerAngle -= playerInput.moveVector.x * deltaTime * 200f;
 
-                    var wheelWorldRotation = math.mul(machineTransform.Rotation, wheelTransform.Rotation);
-                    var wheelWorldPosition = math.mul(machineTransform.Rotation, wheelTransform.Position) + machineTransform.Position;
+                wheelComponent.ValueRW.currentSteerAngle = math.clamp(wheelComponent.ValueRW.currentSteerAngle, -wheelComponent.ValueRW.maxSteerAngle, wheelComponent.ValueRW.maxSteerAngle);
 
-                    velocity = math.mul(wheelWorldRotation, velocity);
+                var wheelWorldRotation = math.mul(machineTransform.Rotation, wheelTransform.Rotation);
+                var wheelWorldPosition = math.mul(machineTransform.Rotation, wheelTransform.Position) + machineTransform.Position;
 
-                    quaternion steerRotation = quaternion.AxisAngle(machineTransform.Up(), math.radians(wheelComponent.ValueRO.currentSteerAngle));
+                velocity = math.mul(wheelWorldRotation, velocity);
 
-                    velocity = math.mul(steerRotation, velocity);
+                quaternion steerRotation = quaternion.AxisAngle(machineTransform.Up(), math.radians(wheelComponent.ValueRO.currentSteerAngle));
 
-                    var wheelForward = math.cross(machineTransform.Up(), math.mul(wheelWorldRotation, math.up()));
+                velocity = math.mul(steerRotation, velocity);
 
-                    var invRadius = 1f / wheelComponent.ValueRW.radius;
-                    wheelComponent.ValueRW.axisRotation -= math.dot(machinePhysicsVelocity.ValueRO.Linear, wheelForward) * invRadius * deltaTime;
+                var wheelForward = math.cross(machineTransform.Up(), math.mul(wheelWorldRotation, math.up()));
 
-                    //todo: friction etx
+                var invRadius = 1f / wheelComponent.ValueRW.radius;
+                wheelComponent.ValueRW.axisRotation -= math.dot(machinePhysicsVelocity.ValueRO.Linear, wheelForward) * invRadius * deltaTime;
 
-                    //note: this point is worldspace
-                    machinePhysicsVelocity.ValueRW.ApplyImpulse(machinePhysicsMass, machineTransform.Position, machineTransform.Rotation, velocity, wheelWorldPosition);
+                //todo: friction etx
 
-                    UnityEngine.Debug.DrawRay(wheelWorldPosition, velocity, UnityEngine.Color.yellow, deltaTime);
+                //note: this point is worldspace
+                machinePhysicsVelocity.ValueRW.ApplyImpulse(machinePhysicsMass, machineTransform.Position, machineTransform.Rotation, velocity, wheelWorldPosition);
 
-                    DebugDraw.DrawTransformFrame(wheelWorldPosition, wheelWorldRotation, deltaTime);
-                }
+                UnityEngine.Debug.DrawRay(wheelWorldPosition, velocity, UnityEngine.Color.yellow, deltaTime);
+
+                DebugDraw.DrawTransformFrame(wheelWorldPosition, wheelWorldRotation, deltaTime);
             }
         }
     }

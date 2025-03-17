@@ -21,7 +21,7 @@ public class BattlingContext : MonoBehaviour
 
         RigidbodyEntityFactory rigidbodyEntityFactory = new RigidbodyEntityFactory();
         PlacedBlockContainer placedBlockContainer = new PlacedBlockContainer();
-        BlockGameObjectContainer blockGameObjectContainer = new BlockGameObjectContainer(blockTypes);
+        BlockGameObjectContainer blockGameObjectContainer = new BlockGameObjectContainer(blockTypes, false);
 
         BlockFactory blockFactory = new BlockFactory(blockTypes);
         blockFactory.RegisterBlockListener(placedBlockContainer);
@@ -33,7 +33,7 @@ public class BattlingContext : MonoBehaviour
         RegisterBlockEntityBuilder<LaserEntityBuilder>(world, simulationGroup, blockFactory);
 
         AddToWorldAndGroupSystemManaged(new PlaceBlockSystem(blockFactory), world, simulationGroup);
-        AddToWorldAndGroupSystemManaged(new LoadAtStartSystem(blockFactory), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new LoadAtStartSystem(blockFactory, spawnPoints), world, simulationGroup);
         
         AddToWorldAndGroupSystemManaged(new ParentGameObjectToMachineSystem(blockGameObjectContainer), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new ParentCameraToMachineSystem(Camera.main.transform.parent), world, simulationGroup);

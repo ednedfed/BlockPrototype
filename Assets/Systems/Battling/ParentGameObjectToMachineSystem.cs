@@ -14,31 +14,23 @@ partial class ParentGameObjectToMachineSystem : SystemBase
         _blockGameObjectContainer = blockGameObjectContainer;
     }
 
-    DebugDraw.PosTracker _posTracker = new DebugDraw.PosTracker();
-
     protected override void OnUpdate()
     {
+        //blocks are usually machine agnostic
+        foreach (var (blockWorld, blockIdComponent) in SystemAPI.Query<LocalToWorld, BlockIdComponent>())
+        {
+            _blockGameObjectContainer.SetPositionAndRotation(blockIdComponent.blockId, blockWorld.Position, blockWorld.Rotation);
+        }
+
+        //specialised offsets are machine-specific (currently)
         foreach (var (machineTag, machineLocalTransform) in SystemAPI.Query<MachineTagComponent, LocalTransform>())
         {
-            bool debug = false;
-
             //add a child offset, currently wheels, but might become generic
-            foreach (var (blockWorld, blockIdComponent) in SystemAPI.Query<LocalToWorld, BlockIdComponent>())
+            foreach (var (wheelComponent, blockLocal, blockIdComponent, machineIdComponent) in SystemAPI.Query<WheelComponent, LocalTransform, BlockIdComponent, MachineIdComponent>())
             {
-                var blockGameObject = _blockGameObjectContainer.GetGameObject(blockIdComponent.blockId);
-                blockGameObject.transform.position = blockWorld.Position;
-                blockGameObject.transform.rotation = blockWorld.Rotation;
+                if (machineIdComponent.machineId != machineTag.machineId)
+                    continue;
 
-                if (debug == false)
-                {
-                    _posTracker.Update(blockGameObject.transform.position, SystemAPI.Time.DeltaTime, UnityEngine.Color.white);
-                    debug = true;
-                }
-            }
-
-            //add a child offset, currently wheels, but might become generic
-            foreach (var (wheelComponent, blockLocal, blockIdComponent) in SystemAPI.Query<WheelComponent, LocalTransform, BlockIdComponent>())
-            {
                 //local offset here
                 var upLocal = math.mul(math.inverse(blockLocal.Rotation), machineLocalTransform.Up());
                 var additionalRotationWorldspace = quaternion.AxisAngle(upLocal, math.radians(wheelComponent.currentSteerAngle));
@@ -51,8 +43,11 @@ partial class ParentGameObjectToMachineSystem : SystemBase
             }
 
             //add a child offset, currently wheels, but might become generic
-            foreach (var (laserComponent, blockLocal, blockIdComponent) in SystemAPI.Query<LaserComponent, RefRW<LocalTransform>, BlockIdComponent>())
+            foreach (var (laserComponent, blockLocal, blockIdComponent, machineIdCompnent) in SystemAPI.Query<LaserComponent, RefRW<LocalTransform>, BlockIdComponent, MachineIdComponent>())
             {
+                if (machineIdCompnent.machineId != machineTag.machineId)
+                    continue;
+
                 var blockWorldPos = math.mul(machineLocalTransform.Rotation, blockLocal.ValueRO.Position) + machineLocalTransform.Position;
 
                 //local offset here

@@ -3,9 +3,9 @@ using UnityEngine;
 
 public static class LoadAndSaveUtility
 {
-    public static void LoadGame(BlockFactory blockFactory)
+    public static void LoadGame(BlockFactory blockFactory, int machineId)
     {
-        blockFactory.Clear();
+        blockFactory.Clear(machineId);
 
         if (File.Exists(BlockGameConstants.SaveGame.SaveLocation) == false)
         {
@@ -37,13 +37,13 @@ public static class LoadAndSaveUtility
                     rot.z = sr.ReadSingle();
                     rot.w = sr.ReadSingle();
 
-                    blockFactory.InstantiateBlock(blockType, pos, rot);
+                    blockFactory.AddBlock(blockType, pos, rot, machineId);
                 }
             }
         }
     }
 
-    public static void SaveGame(uint saveVersion, PlacedBlockContainer placedBlockContainer)
+    public static void SaveGame(uint saveVersion, PlacedBlockContainer placedBlockContainer, int machineId)
     {
         using (var file = new FileStream(BlockGameConstants.SaveGame.SaveLocation, FileMode.Create))
         {
@@ -52,7 +52,7 @@ public static class LoadAndSaveUtility
                 sw.Write(saveVersion);//version
 
                 //todo: make entities?
-                foreach (var placedBlock in placedBlockContainer.GetValues())
+                foreach (var placedBlock in placedBlockContainer.GetValues(machineId))
                 {
                     sw.Write(placedBlock.blockType);
 

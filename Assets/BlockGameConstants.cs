@@ -59,6 +59,7 @@ public abstract class BlockGameConstants
     {
         const string FileName = "/save.bin";
         public readonly static string SaveLocation = Application.persistentDataPath + FileName;
+        public const int BuildMachineId = 0;
     }
 
     public static class WeaponAim
