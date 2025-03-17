@@ -2,16 +2,19 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
+using UnityEngine;
 
 [DisableAutoCreation]
 [UpdateAfter(typeof(ParentGameObjectToMachineSystem))]
 partial class LaserShootingSystem : SystemBase
 {
     BlockGameObjectContainer _blockGameObjectContainer;
+    ParticleSystem _explosion;
 
-    public LaserShootingSystem(BlockGameObjectContainer blockGameObjectContainer)
+    public LaserShootingSystem(BlockGameObjectContainer blockGameObjectContainer, UnityEngine.ParticleSystem explosion)
     {
         _blockGameObjectContainer = blockGameObjectContainer;
+        _explosion = explosion;
     }
 
     protected override void OnUpdate()
@@ -43,6 +46,7 @@ partial class LaserShootingSystem : SystemBase
                     bool haveHit = collisionWorld.CastRay(input, out var hit);
                     if (haveHit)
                     {
+                        //todo: add block health
                         //todo: vfx, laser effect, sound
                         //todo: health
                         UnityEngine.Debug.DrawLine(hit.Position, blockWorld.Position, UnityEngine.Color.yellow, SystemAPI.Time.DeltaTime);
@@ -58,6 +62,10 @@ partial class LaserShootingSystem : SystemBase
 
                         if (hitBlockEntity != Entity.Null && EntityManager.HasComponent<MachineTagComponent>(machineEntity))
                         {
+                            //todo: this can easily be a pool, extract these types into a data object
+                            _explosion.transform.position = hit.Position;
+                            _explosion.Play();
+
                             DeparentBlock(hitBlockEntity, EntityManager, ecb);
 
                             unsafe

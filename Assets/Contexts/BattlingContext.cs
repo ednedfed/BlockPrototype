@@ -6,7 +6,7 @@ using UnityEngine;
 public class BattlingContext : MonoBehaviour
 {
     //scene objects, make spawn later
-    //public GameObject character;
+    public ParticleSystem explosion;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -42,7 +42,7 @@ public class BattlingContext : MonoBehaviour
         AddToWorldAndGroupSystemManaged(new ParentCameraToMachineSystem(Camera.main.transform.parent), world, simulationGroup);
 
         AddToWorldAndGroupSystemManaged(new WeaponAimRaycastSystem(Camera.main.transform), world, simulationGroup);
-        AddToWorldAndGroupSystemManaged(new LaserShootingSystem(blockGameObjectContainer), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new LaserShootingSystem(blockGameObjectContainer, explosion), world, simulationGroup);
         
 
         //camera has no parent yet in this context
