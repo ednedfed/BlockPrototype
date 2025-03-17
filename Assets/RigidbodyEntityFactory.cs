@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class RigidbodyEntityFactory
 {
@@ -17,7 +18,7 @@ public class RigidbodyEntityFactory
 
         entityManager.AddComponentData(rigidbodyEntity, new PhysicsCollider { Value = collider });
         entityManager.AddComponentData(rigidbodyEntity, new LocalTransform { Position = position, Rotation = rotation, Scale = 1f });
-        entityManager.AddComponentData(rigidbodyEntity, new LocalToWorld());
+        entityManager.AddComponentData(rigidbodyEntity, new LocalToWorld() { Value = Unity.Mathematics.float4x4.identity });
 
         // 3. PhysicsMass - Defines mass and inertia (automatic calculation for dynamic bodies)
         var physicsMass = PhysicsMass.CreateDynamic(MassProperties.CreateBox(collider.Value.CalculateAabb().Extents), 1f);

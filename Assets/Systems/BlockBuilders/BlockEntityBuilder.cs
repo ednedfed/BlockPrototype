@@ -33,7 +33,7 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
 
         //set up for parenting
         EntityManager.AddComponentData(newEntity, new Parent());
-        EntityManager.AddComponentData(newEntity, new LocalToWorld());
+        EntityManager.AddComponentData(newEntity, new LocalToWorld() { Value = Unity.Mathematics.float4x4.identity});
 
         //chunk per machine for filtering
         EntityManager.AddSharedComponentManaged(newEntity, new MachineIdComponent() { machineId = blockData.machineId });

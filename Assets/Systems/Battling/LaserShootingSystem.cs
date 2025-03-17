@@ -43,6 +43,8 @@ partial class LaserShootingSystem : SystemBase
                     bool haveHit = collisionWorld.CastRay(input, out var hit);
                     if (haveHit)
                     {
+                        //todo: vfx, laser effect, sound
+                        //todo: health
                         UnityEngine.Debug.DrawLine(hit.Position, blockWorld.Position, UnityEngine.Color.yellow, SystemAPI.Time.DeltaTime);
 
                         var machineEntity = hit.Entity;
@@ -58,9 +60,15 @@ partial class LaserShootingSystem : SystemBase
                         {
                             DeparentBlock(hitBlockEntity, EntityManager, ecb);
 
-                            //todo: now we have to deactivate the child collider
-                            //however this is more complex as the body can be split
-                            //physicsCollider.Value.Value.SetCollisionFilter(CollisionFilter.Zero, colliderKey);
+                            unsafe
+                            {
+                                //todo: body could be split
+                                CompoundCollider* collider = (CompoundCollider*)physicsCollider.ColliderPtr;
+                                
+                                //without using the pointer the collision key doesn't work properly
+                                child.Collider->SetCollisionFilter(CollisionFilter.Zero);
+                                collider->RefreshCollisionFilter();
+                            }
                         }
                     }
                 }
@@ -85,6 +93,9 @@ partial class LaserShootingSystem : SystemBase
         var blockGameObject = _blockGameObjectContainer.GetGameObject(blockId.blockId);
         var collider = blockGameObject.GetComponentInChildren<UnityEngine.Collider>();
 
+        var machineIdComponent = entityManager.GetSharedComponent<MachineIdComponent>(hitBlockEntity);
+
+        //todo: this needs cleaning up
         UnityEngine.BoxCollider boxCollider = (UnityEngine.BoxCollider)collider;
         entityCommandBuffer.AddComponent(hitBlockEntity, new PhysicsCollider
         {
@@ -92,7 +103,13 @@ partial class LaserShootingSystem : SystemBase
             {
                 Center = boxCollider.center,
                 Size = (float3)boxCollider.size * (float3)collider.transform.lossyScale,
-                Orientation = quaternion.identity
+                Orientation = quaternion.identity,
+            },
+            new CollisionFilter
+            {
+                BelongsTo = ~0u,
+                CollidesWith = ~0u, 
+                GroupIndex = -(machineIdComponent.machineId + 1)//todo: propogate nicely
             })
         });
 
@@ -105,15 +122,16 @@ partial class LaserShootingSystem : SystemBase
 
         entityCommandBuffer.AddComponent(hitBlockEntity, new PhysicsVelocity
         {
-            Linear = new float3(random.x, 10f, random.y),
-            Angular = UnityEngine.Random.insideUnitSphere
+            Linear = new float3(random.x*10f, 10f, random.y*10f),
+            Angular = UnityEngine.Random.insideUnitSphere * 5f
         });
 
         //not final but allows it to visually work
-        entityCommandBuffer.AddComponent(hitBlockEntity, new LocalTransform
+        entityCommandBuffer.SetComponent(hitBlockEntity, new LocalTransform
         {
             Position = blockGameObject.transform.position,
             Rotation = blockGameObject.transform.rotation,
+            Scale = 1f//NEEEDED FOR ROTATION
         });
 
         entityCommandBuffer.AddComponent(hitBlockEntity, new PhysicsDamping
