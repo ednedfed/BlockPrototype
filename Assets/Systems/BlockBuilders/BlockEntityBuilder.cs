@@ -31,6 +31,8 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
         EntityManager.AddComponentData(newEntity, new BlockIdComponent() { blockId = blockData.blockId });
         EntityManager.AddComponentData(newEntity, new LocalTransform() { Position = blockData.position, Rotation = blockData.rotation, Scale = 1f });
 
+        EntityManager.AddComponentData(newEntity, new BlockHealthComponent() { health = 1.0f });
+
         //set up for parenting
         EntityManager.AddComponentData(newEntity, new Parent());
         EntityManager.AddComponentData(newEntity, new LocalToWorld() { Value = Unity.Mathematics.float4x4.identity});

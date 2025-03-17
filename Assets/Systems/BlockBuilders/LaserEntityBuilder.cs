@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.Entities;
-using Unity.Transforms;
 
 //this is likely to represent one machine
 [DisableAutoCreation]
@@ -14,6 +13,9 @@ public partial class LaserEntityBuilder : BlockEntityBuilder
 
     public override void OnBuild(in Entity newEntity, in PlacedBlockData blockData)
     {
-        EntityManager.AddComponentData(newEntity, new LaserComponent());
+        EntityManager.AddComponentData(newEntity, new LaserComponent()
+        { 
+            damage = 0.1f
+        });
     }
 }

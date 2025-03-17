@@ -46,9 +46,7 @@ partial class LaserShootingSystem : SystemBase
                     bool haveHit = collisionWorld.CastRay(input, out var hit);
                     if (haveHit)
                     {
-                        //todo: add block health
-                        //todo: vfx, laser effect, sound
-                        //todo: health
+                        //todo: laser effect, sound
                         UnityEngine.Debug.DrawLine(hit.Position, blockWorld.Position, UnityEngine.Color.yellow, SystemAPI.Time.DeltaTime);
 
                         var machineEntity = hit.Entity;
@@ -66,16 +64,27 @@ partial class LaserShootingSystem : SystemBase
                             _explosion.transform.position = hit.Position;
                             _explosion.Play();
 
-                            DeparentBlock(hitBlockEntity, EntityManager, ecb);
-
-                            unsafe
+                            var blochHealthComponent = EntityManager.GetComponentData<BlockHealthComponent>(hitBlockEntity);
+                            if (blochHealthComponent.health > 0f)
                             {
-                                //todo: body could be split
-                                CompoundCollider* collider = (CompoundCollider*)physicsCollider.ColliderPtr;
-                                
-                                //without using the pointer the collision key doesn't work properly
-                                child.Collider->SetCollisionFilter(CollisionFilter.Zero);
-                                collider->RefreshCollisionFilter();
+                                blochHealthComponent.health -= laserComponent.damage;
+                                EntityManager.SetComponentData(hitBlockEntity, blochHealthComponent);
+
+                                //destroyed
+                                if (blochHealthComponent.health <= 0f)
+                                {
+                                    DeparentBlock(hitBlockEntity, EntityManager, ecb);
+
+                                    unsafe
+                                    {
+                                        //todo: body could be split
+                                        CompoundCollider* collider = (CompoundCollider*)physicsCollider.ColliderPtr;
+
+                                        //without using the pointer the collision key doesn't work properly
+                                        child.Collider->SetCollisionFilter(CollisionFilter.Zero);
+                                        collider->RefreshCollisionFilter();
+                                    }
+                                }
                             }
                         }
                     }
