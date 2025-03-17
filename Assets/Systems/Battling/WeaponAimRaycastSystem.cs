@@ -41,11 +41,9 @@ partial class WeaponAimRaycastSystem : SystemBase
             UnityEngine.Debug.DrawLine(_cameraTransform.position, _cameraTransform.position + _cameraTransform.transform.forward * BlockGameConstants.WeaponAim.RaycastDistance, UnityEngine.Color.yellow, SystemAPI.Time.DeltaTime);
             UnityEngine.Debug.DrawLine(_cameraTransform.position, hit.Position, UnityEngine.Color.white, SystemAPI.Time.DeltaTime);
 
-            foreach (var (laser, machineId) in SystemAPI.Query<RefRW<LaserComponent>, MachineIdComponent>())
+            foreach (var laser in SystemAPI.Query<RefRW<LaserComponent>>()
+                .WithSharedComponentFilter(new MachineIdComponent { machineId = machineTagComponent.machineId }))
             {
-                if (machineId.machineId != machineTagComponent.machineId)
-                    continue;
-
                 laser.ValueRW.aimPoint = cameraRaycast.ValueRW.hit.Position;
             }
         }

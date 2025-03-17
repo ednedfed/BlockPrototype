@@ -23,13 +23,14 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
         EntityManager.SetName(newEntity, $"Block_{blockCategory}_{blockData.blockId}");
 
         EntityManager.AddComponentData(newEntity, new BlockIdComponent() { blockId = blockData.blockId });
-        EntityManager.AddComponentData(newEntity, new MachineIdComponent() { machineId = blockData.machineId });
-
         EntityManager.AddComponentData(newEntity, new LocalTransform() { Position = blockData.position, Rotation = blockData.rotation, Scale = 1f });
 
         //set up for parenting
         EntityManager.AddComponentData(newEntity, new Parent());
         EntityManager.AddComponentData(newEntity, new LocalToWorld());
+
+        //chunk per machine for filtering
+        EntityManager.AddSharedComponentManaged(newEntity, new MachineIdComponent() { machineId = blockData.machineId });
 
         OnBuild(newEntity, blockData);
 

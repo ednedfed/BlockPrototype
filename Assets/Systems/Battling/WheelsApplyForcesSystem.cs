@@ -14,11 +14,9 @@ partial class WheelsApplyForcesSystem : SystemBase
 
         foreach (var (machinePhysicsVelocity, machinePhysicsMass, machineTransform, machineTag, playerInput) in SystemAPI.Query<RefRW<PhysicsVelocity>, PhysicsMass, LocalTransform, MachineTagComponent, PlayerInputComponent>())
         {
-            foreach (var (wheelComponent, wheelTransform, machineIdComponent) in SystemAPI.Query<RefRW<WheelComponent>, LocalTransform, MachineIdComponent>())
+            foreach (var (wheelComponent, wheelTransform) in SystemAPI.Query<RefRW<WheelComponent>, LocalTransform>()
+                .WithSharedComponentFilter(new MachineIdComponent { machineId = machineTag.machineId }))
             {
-                if (machineIdComponent.machineId != machineTag.machineId)
-                    continue;
-
                 var velocity = float3.zero;
                 var angularVelocity = float3.zero;
 

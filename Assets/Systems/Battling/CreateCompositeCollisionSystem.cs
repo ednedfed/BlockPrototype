@@ -148,8 +148,6 @@ partial class CreateCompositeCollisionSystem : SystemBase
             EntityManager, compoundCollider, centreOfMass, $"MachineRigidbody_{machineIndex}",
             spawnPosition, spawnRotation);
 
-        
-
         //todo: when do we deal with this, which unity identifies as a leak?
         _entitiesBuilt.Add(machineEntity);
 
@@ -157,13 +155,10 @@ partial class CreateCompositeCollisionSystem : SystemBase
         EntityManager.AddComponentData(machineEntity, new PlayerInputComponent());
         EntityManager.AddComponentData(machineEntity, new CameraRaycastComponent());
 
-        //todo: use shared component
-        foreach (var (blockId, machineId, localTransform, parent) in SystemAPI.Query<BlockIdComponent, MachineIdComponent, RefRW<LocalTransform>, RefRW<Parent>>())
+        foreach (var (blockId, localTransform, parent) in SystemAPI.Query<BlockIdComponent, RefRW<LocalTransform>, RefRW<Parent>>()
+            .WithSharedComponentFilterManaged(new MachineIdComponent { machineId = machineIndex }))
         {
-            if (machineId.machineId == machineIndex)
-            {
-                parent.ValueRW.Value = machineEntity;
-            }
+            parent.ValueRW.Value = machineEntity;
         }
     }
 }
