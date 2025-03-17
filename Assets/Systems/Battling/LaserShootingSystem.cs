@@ -1,3 +1,4 @@
+using System;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -24,17 +25,19 @@ partial class LaserShootingSystem : SystemBase
         //store this on a camera entity? decide how to map weapons to machine, can shared component be used?
         foreach (var (playerInput, machineTag) in SystemAPI.Query<PlayerInputComponent, MachineTagComponent>())
         {
-            foreach (var (laserComponent, blockWorld) in SystemAPI.Query<LaserComponent, LocalToWorld>()
+            foreach (var (laserComponent, blockWorld) in SystemAPI.Query<RefRW<LaserComponent>, LocalToWorld>()
                 .WithSharedComponentFilterManaged(new MachineIdComponent { machineId = machineTag.machineId }))
             {
-                if (playerInput.fire == true)
+                if (playerInput.fire == true && DateTime.UtcNow > laserComponent.ValueRW.nextFireTime)
                 {
+                    laserComponent.ValueRW.nextFireTime = DateTime.UtcNow.AddSeconds(1.0);
+
                     var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
 
                     RaycastInput input = new RaycastInput()
                     {
                         Start = blockWorld.Position,
-                        End = laserComponent.aimPoint,
+                        End = laserComponent.ValueRO.aimPoint,
                         Filter = new CollisionFilter()
                         {
                             BelongsTo = ~0u,
@@ -67,7 +70,7 @@ partial class LaserShootingSystem : SystemBase
                             var blochHealthComponent = EntityManager.GetComponentData<BlockHealthComponent>(hitBlockEntity);
                             if (blochHealthComponent.health > 0f)
                             {
-                                blochHealthComponent.health -= laserComponent.damage;
+                                blochHealthComponent.health -= laserComponent.ValueRW.damage;
                                 EntityManager.SetComponentData(hitBlockEntity, blochHealthComponent);
 
                                 //destroyed

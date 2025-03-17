@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Entities;
 
@@ -15,7 +16,9 @@ public partial class LaserEntityBuilder : BlockEntityBuilder
     {
         EntityManager.AddComponentData(newEntity, new LaserComponent()
         { 
-            damage = 0.1f
+            damage = 0.5f,
+            fireInterval = TimeSpan.FromSeconds(1.0),
+            nextFireTime = DateTime.UtcNow
         });
     }
 }
