@@ -18,12 +18,16 @@ partial class CreateCompositeCollisionSystem : SystemBase
     //these are allocated so must clean after
     List<Entity> _entitiesBuilt = new List<Entity>();
 
+    Dictionary<int, Entity> _entityPerBlockId = new Dictionary<int, Entity>();
+
+
     public CreateCompositeCollisionSystem(BlockGameObjectContainer blockGameObjectContainer, PlacedBlockContainer placedBlockContainer,
-        RigidbodyEntityFactory rigidbodyEntityFactory, SpawnPointComponent[] spawnPoints)
+        RigidbodyEntityFactory rigidbodyEntityFactory, SpawnPointComponent[] spawnPoints, Dictionary<int, Entity> entityPerBlockId)
     {
         _blockGameObjectContainer = blockGameObjectContainer;
         _placedBlockContainer = placedBlockContainer;
         _rigidbodyEntityFactory = rigidbodyEntityFactory;
+        _entityPerBlockId = entityPerBlockId;
 
         _spawnPoints = spawnPoints;
 
@@ -79,7 +83,7 @@ partial class CreateCompositeCollisionSystem : SystemBase
     {
         Vector3 centreOfMass = Vector3.zero;
 
-        NativeList<Unity.Physics.CompoundCollider.ColliderBlobInstance> childColliders = new NativeList<Unity.Physics.CompoundCollider.ColliderBlobInstance>(blocks.Count, Allocator.Temp);
+        NativeList<CompoundCollider.ColliderBlobInstance> childColliders = new NativeList<CompoundCollider.ColliderBlobInstance>(blocks.Count, Allocator.Temp);
 
         foreach (var block in blocks)
         {
@@ -96,7 +100,7 @@ partial class CreateCompositeCollisionSystem : SystemBase
             if (block.blockCategory == BlockCategory.Wheel)
             {
                 UnityEngine.BoxCollider boxCollider = (UnityEngine.BoxCollider)collider;
-                boxColliderEcs = Unity.Physics.SphereCollider.Create(new Unity.Physics.SphereGeometry()
+                boxColliderEcs = Unity.Physics.SphereCollider.Create(new SphereGeometry()
                 {
                     Center = boxCollider.center,
                     Radius = boxCollider.size.x * collider.transform.lossyScale.x * 0.5f,
@@ -108,26 +112,27 @@ partial class CreateCompositeCollisionSystem : SystemBase
             {
                 //todo: add primitive shape varieties
                 UnityEngine.BoxCollider boxCollider = (UnityEngine.BoxCollider)collider;
-                boxColliderEcs = Unity.Physics.BoxCollider.Create(new Unity.Physics.BoxGeometry()
+                boxColliderEcs = Unity.Physics.BoxCollider.Create(new BoxGeometry()
                 {
                     Center = boxCollider.center,
                     Size = (float3)boxCollider.size * (float3)collider.transform.lossyScale,
-                    Orientation = Unity.Mathematics.quaternion.identity
+                    Orientation = quaternion.identity
                 });
             }
 
             childColliders.Add(
-                new Unity.Physics.CompoundCollider.ColliderBlobInstance
+                new CompoundCollider.ColliderBlobInstance
                 {
                     Collider = boxColliderEcs,
-                    CompoundFromChild = new Unity.Mathematics.RigidTransform(blockGameObject.transform.rotation, blockGameObject.transform.position),
+                    CompoundFromChild = new RigidTransform(blockGameObject.transform.rotation, blockGameObject.transform.position),
+                    Entity = _entityPerBlockId[block.blockId]
                 }
             );
 
             centreOfMass += blockGameObject.transform.position;
         }
 
-        var compoundCollider = Unity.Physics.CompoundCollider.Create(childColliders.AsArray());
+        var compoundCollider = CompoundCollider.Create(childColliders.AsArray());
 
         foreach (var child in childColliders)
         {

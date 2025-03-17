@@ -6,7 +6,9 @@ using Unity.Transforms;
 [DisableAutoCreation]
 public partial class LaserEntityBuilder : BlockEntityBuilder
 {
-    Dictionary<int, Entity> _laserEntities = new Dictionary<int, Entity>();
+    public LaserEntityBuilder(Dictionary<int, Entity> entityPerBlockId) : base(entityPerBlockId)
+    {
+    }
 
     public override BlockCategory blockCategory => BlockCategory.Laser;
 

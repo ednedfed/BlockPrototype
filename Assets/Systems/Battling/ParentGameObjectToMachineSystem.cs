@@ -38,19 +38,17 @@ partial class ParentGameObjectToMachineSystem : SystemBase
                 instance.transform.rotation *= math.mul(additionalRotationWorldspace, placeholderTyreRot);
             }
 
-            foreach (var (laserComponent, blockLocal, blockIdComponent) in SystemAPI.Query<LaserComponent, RefRW<LocalTransform>, BlockIdComponent>()
+            foreach (var (laserComponent, blockLocal, blockWorld, blockIdComponent) in SystemAPI.Query<LaserComponent, RefRW<LocalTransform>, LocalToWorld, BlockIdComponent>()
                 .WithSharedComponentFilter(new MachineIdComponent { machineId = machineTag.machineId }))
             {
                 var instance = _blockGameObjectContainer.GetGameObject(blockIdComponent.blockId);
 
-                var blockWorldPos = math.mul(machineLocalTransform.Rotation, blockLocal.ValueRO.Position) + machineLocalTransform.Position;
-                
-                var toTarget = laserComponent.aimPoint - blockWorldPos;
+                var toTarget = laserComponent.aimPoint - blockWorld.Position;
                 var upLocal = machineLocalTransform.Up();
                 var newRight = math.cross(toTarget, upLocal);
                 var newUp = math.cross(newRight, toTarget);
 
-                UnityEngine.Debug.DrawLine(laserComponent.aimPoint, blockWorldPos, UnityEngine.Color.magenta, SystemAPI.Time.DeltaTime);
+                UnityEngine.Debug.DrawLine(laserComponent.aimPoint, blockWorld.Position, UnityEngine.Color.magenta, SystemAPI.Time.DeltaTime);
 
                 instance.transform.rotation = quaternion.LookRotation(toTarget, newUp);
             }

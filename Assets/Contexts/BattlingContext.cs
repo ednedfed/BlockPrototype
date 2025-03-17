@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
@@ -27,10 +28,12 @@ public class BattlingContext : MonoBehaviour
         blockFactory.RegisterBlockListener(placedBlockContainer);
         blockFactory.RegisterBlockListener(blockGameObjectContainer);
 
+        Dictionary<int, Entity> entityPerBlockId = new Dictionary<int, Entity>();
+
         //every block must have this from now on
-        RegisterBlockEntityBuilder<BlockEntityBuilder>(world, simulationGroup, blockFactory);
-        RegisterBlockEntityBuilder<WheelEntityBuilder>(world, simulationGroup, blockFactory);
-        RegisterBlockEntityBuilder<LaserEntityBuilder>(world, simulationGroup, blockFactory);
+        RegisterBlockEntityBuilder(world, simulationGroup, blockFactory, entityPerBlockId, new BlockEntityBuilder(entityPerBlockId));
+        RegisterBlockEntityBuilder(world, simulationGroup, blockFactory, entityPerBlockId, new WheelEntityBuilder(entityPerBlockId));
+        RegisterBlockEntityBuilder(world, simulationGroup, blockFactory, entityPerBlockId, new LaserEntityBuilder(entityPerBlockId));
 
         AddToWorldAndGroupSystemManaged(new PlaceBlockSystem(blockFactory), world, simulationGroup);
         AddToWorldAndGroupSystemManaged(new LoadAtStartSystem(blockFactory, spawnPoints), world, simulationGroup);
@@ -39,13 +42,16 @@ public class BattlingContext : MonoBehaviour
         AddToWorldAndGroupSystemManaged(new ParentCameraToMachineSystem(Camera.main.transform.parent), world, simulationGroup);
 
         AddToWorldAndGroupSystemManaged(new WeaponAimRaycastSystem(Camera.main.transform), world, simulationGroup);
+        AddToWorldAndGroupSystemManaged(new LaserShootingSystem(blockGameObjectContainer), world, simulationGroup);
+        
 
         //camera has no parent yet in this context
         AddToWorldAndGroupSystemManaged(new MouseLookRotationSystem(Camera.main.transform), world, simulationGroup);
 
         var fixedStepSimulationGroup = world.GetOrCreateSystemManaged<FixedStepSimulationSystemGroup>();
 
-        AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer, rigidbodyEntityFactory, spawnPoints), world, fixedStepSimulationGroup);        
+        AddToWorldAndGroupSystemManaged(new CreateCompositeCollisionSystem(blockGameObjectContainer, placedBlockContainer, rigidbodyEntityFactory, spawnPoints, entityPerBlockId),
+            world, fixedStepSimulationGroup);        
 
         AddToWorldAndGroupSystemManaged(new MachineControllerSystem(), world, fixedStepSimulationGroup);
         AddToWorldAndGroupSystemManaged(new WheelsApplyForcesSystem(), world, fixedStepSimulationGroup);
@@ -54,10 +60,9 @@ public class BattlingContext : MonoBehaviour
         fixedStepSimulationGroup.SortSystems();
     }
 
-    static void RegisterBlockEntityBuilder<T>(World world, SimulationSystemGroup simulationGroup, BlockFactory blockFactory)
-        where T : SystemBase, IBlockFactoryListenerWithCategory, new()
+    static void RegisterBlockEntityBuilder<T>(World world, SimulationSystemGroup simulationGroup, BlockFactory blockFactory, Dictionary<int, Entity> entityPerBlockId, T builder)
+         where T : BlockEntityBuilder
     {
-        var builder = new T();
         blockFactory.RegisterBlockListenerWithCategory(builder);
         AddToWorldAndGroupSystemManaged(builder, world, simulationGroup);
     }

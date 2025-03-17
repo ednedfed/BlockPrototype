@@ -6,10 +6,12 @@ using UnityEngine.InputSystem;
 partial class MachineControllerSystem : SystemBase
 {
     InputAction _moveAction;
+    InputAction _fireAction;
 
     public MachineControllerSystem()
     {
         _moveAction = InputSystem.actions.FindAction("Move");
+        _fireAction = InputSystem.actions.FindAction("Attack");
     }
 
     protected override void OnCreate()
@@ -27,6 +29,7 @@ partial class MachineControllerSystem : SystemBase
                 continue;
 
             playerInput.ValueRW.moveVector = _moveAction.ReadValue<Vector2>();
+            playerInput.ValueRW.fire = _fireAction.IsPressed();
         }
     }
 }

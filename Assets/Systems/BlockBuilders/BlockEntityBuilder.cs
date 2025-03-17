@@ -6,9 +6,15 @@ using Unity.Transforms;
 [DisableAutoCreation]
 public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithCategory
 {
-    private Dictionary<int, Entity> _builtEntities = new Dictionary<int, Entity>();
+    Dictionary<int, Entity> _entityPerBlockId = new Dictionary<int, Entity>();
 
     public virtual BlockCategory blockCategory => BlockCategory.Primitive;
+
+    //note: eventually no game objects
+    public BlockEntityBuilder(Dictionary<int, Entity> entityPerBlockId)
+    {
+        _entityPerBlockId = entityPerBlockId;
+    }
 
     public virtual void OnBuild(in Entity newEntity, in PlacedBlockData blockData) { }
 
@@ -34,16 +40,16 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
 
         OnBuild(newEntity, blockData);
 
-        _builtEntities.Add(blockData.blockId, newEntity);
+        _entityPerBlockId.Add(blockData.blockId, newEntity);
     }
 
     public void OnRemove(int blockId)
     {
-        if (_builtEntities.ContainsKey(blockId))
+        if (_entityPerBlockId.ContainsKey(blockId))
         {
-            EntityManager.DestroyEntity(_builtEntities[blockId]);
+            EntityManager.DestroyEntity(_entityPerBlockId[blockId]);
 
-            _builtEntities.Remove(blockId);
+            _entityPerBlockId.Remove(blockId);
         }
     }
 
@@ -56,11 +62,11 @@ public partial class BlockEntityBuilder : SystemBase, IBlockFactoryListenerWithC
 
     public void OnClear()
     {
-        foreach (var entity in _builtEntities.Values)
+        foreach (var entity in _entityPerBlockId.Values)
         {
             EntityManager.DestroyEntity(entity);
         }
 
-        _builtEntities.Clear();
+        _entityPerBlockId.Clear();
     }
 }

@@ -6,6 +6,10 @@ using Unity.Transforms;
 [DisableAutoCreation]
 public partial class WheelEntityBuilder : BlockEntityBuilder
 {
+    public WheelEntityBuilder(Dictionary<int, Entity> entityPerBlockId) : base(entityPerBlockId)
+    {
+    }
+
     public override BlockCategory blockCategory => BlockCategory.Wheel;
 
     public override void OnBuild(in Entity newEntity, in PlacedBlockData blockData)

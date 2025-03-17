@@ -12,12 +12,6 @@ partial class MouseLookRotationSystem : SystemBase
         _cameraRoot = cameraRoot;
     }
 
-    protected override void OnCreate()
-    {
-        //don't have pointer waving around
-        Cursor.lockState = CursorLockMode.Locked;
-    }
-
     protected override void OnUpdate()
     {
         var mouseDelta = Input.mousePositionDelta * BlockGameConstants.Camera.RotateSpeed;
