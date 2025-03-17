@@ -1,6 +1,7 @@
-using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using UnityEngine;
 
 [DisableAutoCreation]
@@ -16,21 +17,31 @@ partial class WeaponAimRaycastSystem : SystemBase
     protected override void OnUpdate()
     {
         //store this on a camera entity? decide how to map weapons to machine, can shared component be used?
-        foreach (var cameraRaycast in SystemAPI.Query<RefRW<CameraRaycastComponent>>())
+        foreach (var (cameraRaycast, machineTagComponent) in SystemAPI.Query<RefRW<CameraRaycastComponent>, MachineTagComponent>())
         {
-            //todo: mask own machine, use camera per machine?
-            Physics.Raycast(_cameraTransform.position,
-                _cameraTransform.transform.forward, out var hitInfo,
-                BlockGameConstants.WeaponAim.RaycastDistance, BlockGameConstants.GameLayers.InverseGhostLayerMask);
+            var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
 
-            cameraRaycast.ValueRW.hitInfo = hitInfo;
+            RaycastInput input = new RaycastInput()
+            {
+                Start = _cameraTransform.position,
+                End = _cameraTransform.position + _cameraTransform.transform.forward* BlockGameConstants.WeaponAim.RaycastDistance,
+                Filter = new CollisionFilter()
+                {
+                    BelongsTo = ~0u,
+                    CollidesWith = ~0u,
+                    GroupIndex = -machineTagComponent.collisionGroupIndex
+                }
+            };
+
+            bool haveHit = collisionWorld.CastRay(input, out var hit);
+            cameraRaycast.ValueRW.hit = hit;
 
             UnityEngine.Debug.DrawLine(_cameraTransform.position, _cameraTransform.position + _cameraTransform.transform.forward * BlockGameConstants.WeaponAim.RaycastDistance, UnityEngine.Color.yellow, SystemAPI.Time.DeltaTime);
-            UnityEngine.Debug.DrawLine(_cameraTransform.position, hitInfo.point, UnityEngine.Color.white, SystemAPI.Time.DeltaTime);
+            UnityEngine.Debug.DrawLine(_cameraTransform.position, hit.Position, UnityEngine.Color.white, SystemAPI.Time.DeltaTime);
 
             foreach (var laser in SystemAPI.Query<RefRW<LaserComponent>>())
             {
-                laser.ValueRW.aimPoint = (float3)cameraRaycast.ValueRW.hitInfo.point;
+                laser.ValueRW.aimPoint = cameraRaycast.ValueRW.hit.Position;
             }
         }
     }

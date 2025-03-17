@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
@@ -35,6 +34,7 @@ partial class CreateCompositeCollisionSystem : SystemBase
     }
 
 #if UNITY_EDITOR
+    //later this can be more legit, i.e. have a context shutdown method
     private void OnPlayModeStateChanged(PlayModeStateChange change)
     {
         if (change == PlayModeStateChange.ExitingPlayMode)
@@ -57,17 +57,17 @@ partial class CreateCompositeCollisionSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        //todo: eventually use pure entities
+        //todo: eventually use pure entities but for now it's ok to use collider from game objects
         var blocks = _placedBlockContainer.GetValues();
         if (_created == false && blocks.Count > 0)
         {
-            CreateMachineCompositeCollider(blocks);
+            CreateMachineCompositeCollider(blocks, 1);
 
             _created = true;
         }
     }
 
-    void CreateMachineCompositeCollider(Dictionary<int, PlacedBlockData>.ValueCollection blocks)
+    void CreateMachineCompositeCollider(Dictionary<int, PlacedBlockData>.ValueCollection blocks, int machineId)
     {
         Vector3 centreOfMass = Vector3.zero;
 
@@ -126,6 +126,10 @@ partial class CreateCompositeCollisionSystem : SystemBase
 
         centreOfMass /= blocks.Count;
 
+        var filter = compoundCollider.Value.GetCollisionFilter();
+        filter.GroupIndex = -machineId;
+        compoundCollider.Value.SetCollisionFilter(filter);
+
         Entity machineEntity = _rigidbodyEntityFactory.CreateRigidbodyEntity(EntityManager, compoundCollider, centreOfMass, "MachineRigidbody");
 
 
@@ -133,7 +137,7 @@ partial class CreateCompositeCollisionSystem : SystemBase
         _entitisBuilt.Add(machineEntity);
 
         //todo: per block? per machine? decide
-        EntityManager.AddSharedComponent(machineEntity, new MachineTagComponent());
+        EntityManager.AddSharedComponent(machineEntity, new MachineTagComponent() { collisionGroupIndex = machineId });
         EntityManager.AddComponentData(machineEntity, new PlayerInputComponent());
         EntityManager.AddComponentData(machineEntity, new CameraRaycastComponent());
 

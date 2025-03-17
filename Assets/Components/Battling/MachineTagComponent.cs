@@ -2,4 +2,5 @@
 
 public struct MachineTagComponent : ISharedComponentData
 {
+    public int collisionGroupIndex;
 }

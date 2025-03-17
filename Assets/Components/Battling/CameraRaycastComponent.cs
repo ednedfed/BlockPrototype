@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
-using UnityEngine;
 
 public struct CameraRaycastComponent : IComponentData
 {
-    internal RaycastHit hitInfo;
+    public Unity.Physics.RaycastHit hit;
 }
